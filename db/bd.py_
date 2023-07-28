@@ -1,0 +1,56 @@
+import asyncio
+import sqlalchemy as sa
+from sqlalchemy.ext.asyncio import create_async_engine
+
+
+metadata = sa.MetaData()
+
+tbl = sa.Table('tbl', metadata,
+               sa.Column('id', sa.Integer, primary_key=True),
+               sa.Column('val', sa.String(255)),
+               sa.Column('name', sa.String(50)))
+
+
+async def async_main() -> None:
+    engine = create_async_engine(
+        "postgresql+asyncpg://scott:tiger@localhost/test",
+        echo=True,
+    )
+[]
+    async with engine.begin() as conn:
+        await conn.run_sync(metadata.create_all)
+
+        await conn.execute(
+            tbl.insert(), [{"name": "some name 1"}, {"name": "some name 2"}]
+        )
+
+    async with engine.connect() as conn:
+        # select a Result, which will be delivered with buffered
+        # results
+        result = await conn.execute(sa.select(tbl).where(tbl.c.name == "some name 1"))
+
+        print(result.fetchall())
+
+    # for AsyncEngine created in function scope, close and
+    # clean-up pooled connections
+    await engine.dispose()
+
+
+asyncio.run(async_main())
+
+# async def go(loop):
+#     engine = await create_engine(user='root', db='test_pymysql',
+#                                  host='127.0.0.1', password='', loop=loop)
+#     async with engine.acquire() as conn:
+#         await conn.execute(tbl.insert().values(val='abc'))
+#         await conn.execute(tbl.insert().values(val='xyz'))
+#
+#         async for row in conn.execute(tbl.select()):
+#             print(row.id, row.val)
+#
+#     engine.close()
+#     await engine.wait_closed()
+#
+#
+# loop = asyncio.new_event_loop() #   get_event_loop()
+# loop.run_until_complete(go(loop))

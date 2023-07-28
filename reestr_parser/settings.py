@@ -10,8 +10,8 @@
 BOT_NAME = "reestr_parser"
 
 LOG_ENABLED = True
-LOG_LEVEL = 'DEBUG'  # ERROR INFO WARN
-# LOG_FILE = 'info.log'
+LOG_LEVEL = 'ERROR'  # ERROR INFO WARN DEBUG
+#LOG_FILE = 'info.log'
 
 SPIDER_MODULES = ["reestr_parser.spiders"]
 NEWSPIDER_MODULE = "reestr_parser.spiders"
@@ -99,13 +99,13 @@ FEED_EXPORT_ENCODING = "utf-8"
 # for Chrome driver
 from shutil import which
 
-SELENIUM_DRIVER_NAME = 'chrome'
-SELENIUM_DRIVER_EXECUTABLE_PATH = which('chromedriver')
-SELENIUM_DRIVER_ARGUMENTS = ['--headless']
-
-DOWNLOADER_MIDDLEWARES = {
-    'scrapy_selenium.SeleniumMiddleware': 800
-}
+# SELENIUM_DRIVER_NAME = 'chrome'
+# SELENIUM_DRIVER_EXECUTABLE_PATH = which('chromedriver')
+# SELENIUM_DRIVER_ARGUMENTS = ['--headless']
+#
+# DOWNLOADER_MIDDLEWARES = {
+#     'scrapy_selenium.SeleniumMiddleware': 800
+# }
 
 # # For Firefox driver
 # from shutil import which
@@ -113,9 +113,9 @@ DOWNLOADER_MIDDLEWARES = {
 # SELENIUM_DRIVER_NAME = 'firefox'
 # SELENIUM_DRIVER_EXECUTABLE_PATH = which('geckodriver')
 # SELENIUM_DRIVER_ARGUMENTS = ['--headless']
-#
-# DOWNLOADER_MIDDLEWARES = {
-#     'scrapy_selenium.SeleniumMiddleware': 800
-# }
+
+DOWNLOADER_MIDDLEWARES = {
+    'scrapy_selenium.SeleniumMiddleware': 800
+}
 
 BD_PARAMS = {'host': 'localhost', 'port': 27018}

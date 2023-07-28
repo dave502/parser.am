@@ -27,6 +27,7 @@ class ReestrParserItem(scrapy.Item):
     report_reality_type = scrapy.Field()
     report_quantity = scrapy.Field()
     report_project_date = scrapy.Field()
+    report_project_date_start = scrapy.Field()
     report_project_date_end = scrapy.Field()
     report_check_act_link = scrapy.Field()
     report_intermediate_docs_link = scrapy.Field()

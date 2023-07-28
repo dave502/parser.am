@@ -5,6 +5,7 @@ class Settings(BaseSettings):
     # Желательно вместо str использовать SecretStr
     # для конфиденциальных данных, например, токена бота
     bot_token: SecretStr
+    payments_provider_token: SecretStr
 
     # Вложенный класс с дополнительными указаниями для настроек
     class Config:
