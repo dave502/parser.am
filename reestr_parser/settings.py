@@ -118,4 +118,4 @@ DOWNLOADER_MIDDLEWARES = {
     'scrapy_selenium.SeleniumMiddleware': 800
 }
 
-BD_PARAMS = {'host': 'localhost', 'port': 27018}
+BD_PARAMS = {'host': 'localhost', 'port': 27017}

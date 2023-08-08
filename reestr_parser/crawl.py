@@ -1,6 +1,7 @@
 import pathlib
 import sys
-sys.path.insert(0, '/home/dave/DEV/ReestrParser')
+import os
+sys.path.insert(0, os.getenv("ROOT_DIR", '/home/dave/DEV/ReestrParser'))
 
 import datetime
 from scrapy.crawler import CrawlerProcess

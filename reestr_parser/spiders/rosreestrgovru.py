@@ -1,7 +1,7 @@
 import time
 import sys
-
-sys.path.insert(0, '/home/dave/DEV/ReestrParser')
+import os
+sys.path.insert(0, os.getenv("ROOT_DIR", '/home/dave/DEV/ReestrParser'))
 import scrapy
 from scrapy.http import HtmlResponse, TextResponse
 from logger.logger import setup_logger, PROCEDURES_LOGGER_NAME
@@ -89,7 +89,8 @@ class RosreestrgovruSpider(scrapy.Spider):
 
     def __del__(self):
         testlogger.info(f'__del__')
-        self.driver.close()
+        if self.driver:
+            self.driver.close()
 
     # class wait_for_page_load(object):
     #     def __init__(self, browser):

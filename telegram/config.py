@@ -1,5 +1,5 @@
 from pydantic import BaseSettings, SecretStr
-
+from os import getenv
 
 class Settings(BaseSettings):
     # Желательно вместо str использовать SecretStr
@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     class Config:
         # Имя файла, откуда будут прочитаны данные
         # (относительно текущей рабочей директории)
-        env_file = '/home/dave/DEV/ReestrParser/telegram/.env'
+        env_file = '.env.vars' #getenv("ROOT_DIR"+'/telegram/.env', '/home/dave/DEV/ReestrParser/telegram/.env')
         # Кодировка читаемого файла
         env_file_encoding = 'utf-8'
 

@@ -1,6 +1,7 @@
 import pathlib
 import sys
-sys.path.insert(0, '/home/dave/DEV/ReestrParser')
+import os
+sys.path.insert(0, os.getenv("ROOT_DIR", '/home/dave/DEV/ReestrParser'))
 import asyncio
 import datetime
 from aiogram import Bot, Dispatcher, exceptions
