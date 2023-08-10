@@ -526,7 +526,7 @@ async def show_users(msg: Message, session: AsyncSession):
 async def show_users(msg: Message, session: AsyncSession):
     if msg.from_user.id == ADMIN_ID:
         payments = await PaymentQuery.get_all_payments(session)
-        await msg.answer(f'Список всех платежей: ' + "\n" +
+        await msg.answer(f'Список всех платежей: ' + "\n⦁" +
                          "\n⦁".join([f'user {payment.user_id} : date {payment.date} : sum {payment.amount / 100}'
                                      for payment in payments]))
 
@@ -571,7 +571,7 @@ async def show_users(msg: Message, session: AsyncSession):
 async def show_users(msg: Message, session: AsyncSession):
     if msg.from_user.id == ADMIN_ID:
         app_path = pathlib.Path(__file__).parent.resolve().parents[0]
-        cron_log = '/var/log/cron.log'
+        cron_log = app_path / 'logs/cron.log'
         if os.stat(cron_log).st_size == 0:
             await msg.answer('В cron лог отсутсвует содержимое')
         else:

@@ -16,7 +16,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN apt-get update && apt-get install -y cron \
     && apt-get install -y --no-install-recommends ca-certificates curl firefox-esr \
     && rm -fr /var/lib/apt/lists/*
-RUN touch /bot/logs/cron.log
+RUN touch $AppDir/logs/cron.log
 RUN chmod -R +x ./cron
 # https://docs.docker.com/config/containers/multi-service_container/
 RUN chmod +x ./run.sh
