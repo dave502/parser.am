@@ -1,5 +1,9 @@
 version: '3.9'
 
+volumes:
+  reestrparser_bot_data:
+  reestrparser_bot_logs:
+
 services:
   bot:
     container_name: bot
@@ -13,5 +17,5 @@ services:
     env_file:
       - .env.vars
     volumes:
-      - /etc/bot/db:./db/sqlite
-      - /var/logs/bot:./logs
+      - reestrparser_bot_data:/bot/db/sqlite
+      - reestrparser_bot_logs:/bot/logs
