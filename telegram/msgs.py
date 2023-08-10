@@ -1,33 +1,40 @@
 from urllib.parse import urlparse
 
 
-def new_notice(doc):
+def notice_text(data: dict):
+    if data.get["type"] == "update":
+        return date_updated_notice(data)
+    else:
+        return new_notice(data)
+
+
+def new_notice(data: dict):
     return f"Уважаемый клиент(подписчик), настоящим сообщением уведомляем Вас, " \
            f"что проект отчёта о результатах государственной кадастровой оценки " \
-           f"в регионе {doc.get('region')} размещён на сайте " \
+           f"в регионе {data.get('region.name')} размещён на сайте " \
            f"государственного бюджетного учреждения по адресу: \n" \
-           f"{doc.get('report_intermediate_docs_link')}.\n" \
-           f"Дата размещения проекта отчёта: {doc.get('report_project_date_start')} \n" \
-           f"Дата окончания срока ознакомления с проектом отчета: {doc.get('report_project_date_end')}\n" \
-           f"Дата окончания приема замечаний к проекту отчета: {doc.get('report_project_date_end')}\n" \
+           f"{data.get('report_intermediate_docs_link')}.\n" \
+           f"Дата размещения проекта отчёта: {data.get('report_project_date_start')} \n" \
+           f"Дата окончания срока ознакомления с проектом отчета: {data.get('report_project_date_end')}\n" \
+           f"Дата окончания приема замечаний к проекту отчета: {data.get('report_project_date_end')}\n" \
            f"Замечания к отчёту могут быть направлены в адрес " \
-           f"<a href='{urlparse(doc.get('report_intermediate_docs_link')).netloc}'>" \
+           f"<a href='{urlparse(data.get('report_intermediate_docs_link')).netloc}'>" \
            f"Государственного Бюджетного Учреждения</a>, созданного субъектом Российской Федерации и наделённого " \
            f"полномочиями, связанными с определением кадастровой стоимости\n" \
            f"Требования к Замечаниям к проекту отчета содержатся в Статье 14 Федерального закона N 237-ФЗ" \
            f"\"О государственной кадастровой оценке\" от 03.07.2016"
 
 
-def date_updated_notice(doc):
+def date_updated_notice(data: dict):
     return f"Уважаемый клиент(подписчик), настоящим сообщением уведомляем Вас, " \
-           f"что дата окончания срока ознакомления с проектом отчета в регионе {doc.get('region')} изменилась" \
+           f"что дата окончания срока ознакомления с проектом отчета в регионе {data.get('region')} изменилась" \
            f"отчёта размещён на сайте государственного бюджетного учреждения по адресу: \n" \
-           f"{doc.get('report_intermediate_docs_link')}.\n" \
-           f"Дата размещения проекта отчёта: {doc.get('report_project_date_start')} \n" \
-           f"Дата окончания срока ознакомления с проектом отчета: {doc.get('report_project_date_end')}\n" \
-           f"Дата окончания приема замечаний к проекту отчета: {doc.get('report_project_date_end')}\n" \
+           f"{data.get('report_intermediate_docs_link')}.\n" \
+           f"Дата размещения проекта отчёта: {data.get('report_project_date_start')} \n" \
+           f"Дата окончания срока ознакомления с проектом отчета: {data.get('report_project_date_end')}\n" \
+           f"Дата окончания приема замечаний к проекту отчета: {data.get('report_project_date_end')}\n" \
            f"Замечания к отчёту могут быть направлены в адрес " \
-           f"<a href='{urlparse(doc.get('report_intermediate_docs_link')).netloc}'>" \
+           f"<a href='{urlparse(data.get('report_intermediate_docs_link')).netloc}'>" \
            f"Государственного Бюджетного Учреждения</a>, созданного субъектом Российской Федерации и наделённого " \
            f"полномочиями, связанными с определением кадастровой стоимости\n" \
            f"Требования к Замечаниям к проекту отчета содержатся в Статье 14 Федерального закона N 237-ФЗ" \

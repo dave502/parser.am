@@ -20,6 +20,7 @@ def admin_menu() -> ReplyKeyboardMarkup:
         KeyboardButton(text="Изменения"),
     )
     builder.row(
+        KeyboardButton(text="⏲ Лог cron"),
         KeyboardButton(text="◀️ Выйти"),
     )
     return builder.as_markup()

@@ -559,11 +559,23 @@ async def show_users(msg: Message, session: AsyncSession):
         log = FSInputFile(max(files))
         await msg.answer_document(log)
 
-    @router.message(F.text == "Изменения")
-    async def show_users(msg: Message, session: AsyncSession):
-        if msg.from_user.id == ADMIN_ID:
-            app_path = pathlib.Path(__file__).parent.resolve().parents[0]
-            log = FSInputFile(f'{app_path}/logs/{REGION_CHANGES}.log')
+@router.message(F.text == "Изменения")
+async def show_users(msg: Message, session: AsyncSession):
+    if msg.from_user.id == ADMIN_ID:
+        app_path = pathlib.Path(__file__).parent.resolve().parents[0]
+        log = FSInputFile(f'{app_path}/logs/{REGION_CHANGES}.log')
+        await msg.answer_document(log)
+
+
+@router.message(F.text == "⏲ Лог cron")
+async def show_users(msg: Message, session: AsyncSession):
+    if msg.from_user.id == ADMIN_ID:
+        app_path = pathlib.Path(__file__).parent.resolve().parents[0]
+        cron_log = '/var/log/cron.log'
+        if os.stat(cron_log).st_size == 0:
+            await msg.answer('В cron лог отсутсвует содержимое')
+        else:
+            log = FSInputFile(cron_log)
             await msg.answer_document(log)
 
 

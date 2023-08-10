@@ -96,8 +96,8 @@ REQUEST_FINGERPRINTER_IMPLEMENTATION = "2.7"
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 FEED_EXPORT_ENCODING = "utf-8"
 
-# for Chrome driver
-from shutil import which
+# # for Chrome driver
+# from shutil import which
 
 # SELENIUM_DRIVER_NAME = 'chrome'
 # SELENIUM_DRIVER_EXECUTABLE_PATH = which('chromedriver')
@@ -118,4 +118,4 @@ DOWNLOADER_MIDDLEWARES = {
     'scrapy_selenium.SeleniumMiddleware': 800
 }
 
-BD_PARAMS = {'host': 'localhost', 'port': 27017}
+BD_PARAMS = {'host': 'mongodb', 'port': 27017}

@@ -8,7 +8,7 @@ import scrapy
 
 class ReestrParserItem(scrapy.Item):
 
-    _id = scrapy.Field()  # field for mongo
+    id = scrapy.Field()  # field for mongo
     url = scrapy.Field()
     title = scrapy.Field()
     status = scrapy.Field()
@@ -31,4 +31,3 @@ class ReestrParserItem(scrapy.Item):
     report_project_date_end = scrapy.Field()
     report_check_act_link = scrapy.Field()
     report_intermediate_docs_link = scrapy.Field()
-

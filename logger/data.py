@@ -15,7 +15,7 @@ headers = ['doc_id',
 
 def get_row_data(**doc):
     row_data = [
-        doc['_id'],
+        doc['id'],
         doc['in_db'],
         doc['status_id'],
         doc['old_status_id'],

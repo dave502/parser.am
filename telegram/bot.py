@@ -1,3 +1,4 @@
+import json
 import pathlib
 import sys
 import os
@@ -10,6 +11,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from db.queries import SubscriptionQuery
 from telegram.config import config
 from telegram.handlers import router
+from telegram.msgs import notice_text
 from aiogram.utils.callback_answer import CallbackAnswerMiddleware
 from db.init_db import new_db, init_db
 from db.config import async_session
@@ -61,7 +63,8 @@ async def main():
                 subscriptions = await SubscriptionQuery.get_scheduled_subscriptions(_session)
                 try:
                     for subscription in subscriptions:
-                        if await send_message_to_user(subscription.user_id, subscription.notice_text):
+                        data_dict = json.loads(subscription.notice_text)
+                        if await send_message_to_user(subscription.user_id, notice_text(data_dict)):
                             await SubscriptionQuery.set_subscription_notice_sent(
                                 user_id=subscription.user_id,
                                 region=subscription.region_id,

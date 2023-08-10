@@ -86,7 +86,7 @@ class SubscriptionQuery:
         extra_queries = []
 
         if isinstance(region, str):
-            region = RegionQuery.get_region_id(session=session, name=region).id
+            region = RegionQuery.sync_get_region_id(session=session, name=region).id
 
         if only_for_new_users:
             extra_queries.append(Subscripton.notice_sent == False)

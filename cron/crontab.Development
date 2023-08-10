@@ -1,2 +1,2 @@
 PYTHONPATH=/bot
-0 */1 * * * /usr/local/bin/python /bot/reestr_parser/crawl.py >> /var/log/cron.log 2>&1
+0 */6 * * * /usr/local/bin/python /bot/reestr_parser/crawl.py >> /bot/logs/cron.log 2>&1

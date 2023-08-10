@@ -133,7 +133,13 @@ class RegionQuery:
 
 
     @staticmethod
-    def get_region_id(session: Session, name: str) -> Region:
+    async def get_region_id(session: AsyncSession, name: str) -> Region:
+        q = await session.execute(select(Region).where(Region.name == name))
+        return q.scalars().one_or_none()
+
+
+    @staticmethod
+    def sync_get_region_id(session: Session, name: str) -> Region:
         q = session.execute(select(Region).where(Region.name == name))
         return q.scalars().one_or_none()
 
