@@ -2,7 +2,7 @@ from urllib.parse import urlparse
 
 
 def notice_text(data: dict):
-    if data.get["type"] == "update":
+    if data.get("type") == "update":
         return date_updated_notice(data)
     else:
         return new_notice(data)
