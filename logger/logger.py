@@ -61,11 +61,11 @@ class CSVTimedRotatingFileHandler(handlers.TimedRotatingFileHandler):
         super().emit(record)
 
 
-def setup_logger(logger_name, logfile):
+def setup_logger(logger_name, logfile, days_rotate=3):
     logger = logging.getLogger(logger_name)
     logger.setLevel(logging.INFO)
     # create file handler which logs even debug messages
-    fh = logging.FileHandler(logfile)
+    fh = handlers.TimedRotatingFileHandler(logfile, when='D', interval=days_rotate)
     fh.setLevel(logging.INFO)
     # create console handler with a higher log level
     ch = logging.StreamHandler()

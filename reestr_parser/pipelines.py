@@ -129,8 +129,8 @@ class ReestrParserPipeline:
                     notice_dict = {
                             "region":item['region'],
                             "report_intermediate_docs_link":item.get('report_intermediate_docs_link'),
-                            "report_project_date_start":item.get('report_project_date_start'),
-                            "report_project_date_end":item.get('report_project_date_end'),
+                            "report_project_date_start":item.get('report_project_date_start').strftime("%d.%m.%Y"),
+                            "report_project_date_end":item.get('report_project_date_end').strftime("%d.%m.%Y"),
                         }
 
                     if db_doc_status_code != 4:
