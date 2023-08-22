@@ -8,7 +8,7 @@ from scrapy.crawler import CrawlerProcess
 from scrapy.settings import Settings
 import settings
 from spiders.rosreestrgovru import RosreestrgovruSpider
-from logger.logger import setup_logger, REGION_CHANGES, setup_csv_logger, ALL_REGIONS_CSV
+from logger.logger import setup_logger, setup_csv_logger, REGION_CHANGES, ALL_REGIONS_CSV
 from logger.data import headers
 
 

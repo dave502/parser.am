@@ -9,7 +9,7 @@
 
 BOT_NAME = "reestr_parser"
 
-LOG_ENABLED = True
+#LOG_ENABLED = True
 LOG_LEVEL = 'ERROR'  # ERROR INFO WARN DEBUG
 #LOG_FILE = 'info.log'
 

@@ -11,7 +11,7 @@ def notice_text(data: dict):
 def new_notice(data: dict):
     return f"Уважаемый клиент(подписчик), настоящим сообщением уведомляем Вас, " \
            f"что проект отчёта о результатах государственной кадастровой оценки " \
-           f"в регионе {data.get('region.name')} размещён на сайте " \
+           f"в регионе {data.get('region')} размещён на сайте " \
            f"государственного бюджетного учреждения по адресу: \n" \
            f"{data.get('report_intermediate_docs_link')}.\n" \
            f"Дата размещения проекта отчёта: {data.get('report_project_date_start')} \n" \

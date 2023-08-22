@@ -14,7 +14,7 @@ class Document(Base):
     report_intermediate_docs_link = Column(String)
     report_project_date_start = Column(DateTime)
     report_project_date_end = Column(DateTime)
-    update_date = Column(DateTime, default=func.now())
+    update_date = Column(DateTime, onupdate=func.now())
 
     def to_dict(self):
         return {field.name:getattr(self, field.name) for field in self.__table__.c if field.name != "update_date"}
