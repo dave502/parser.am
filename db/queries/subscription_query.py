@@ -60,7 +60,7 @@ class SubscriptionQuery:
         return q.scalars().all()
 
     @staticmethod
-    async def set_subscription_notice_sent(user_id: int, region: int | str, session: AsyncSession):
+    async def set_subscription_notice_sent(user_id: int, region: int | str, session: AsyncSession, commit=True):
         q = None
         match region:
             case int():
@@ -73,7 +73,8 @@ class SubscriptionQuery:
                     values(notice_sent=True, notice_date=datetime.now(), scheduled=None, notice_text=None)
         q.execution_options(synchronize_session="fetch")
         await session.execute(q)
-        await session.commit()
+        if commit:
+            await session.commit()
 
     @staticmethod
     def set_subscription_notice_scheduled(region: int | str,

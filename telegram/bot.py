@@ -68,7 +68,8 @@ async def main():
                             await SubscriptionQuery.set_subscription_notice_sent(
                                 user_id=subscription.user_id,
                                 region=subscription.region_id,
-                                session=_session)
+                                session=_session,
+                                commit=False)
                         # 20 messages per second (Limit: 30 messages per second)
                         await asyncio.sleep(.05)
                 finally:
