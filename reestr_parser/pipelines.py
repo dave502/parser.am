@@ -48,10 +48,12 @@ class ReestrParserPipeline:
         # self.start_date = datetime.datetime.now() - datetime.timedelta(days=365)
         # self.csv_logger = CSVLogger()
 
-        sqlite_path = resources.path("db.sqlite", "sqlite.db")
+        sqlite_path = app_path / "db"/ "sqlite" / "sqlite.db" #resources.path("db.sqlite", "sqlite.db")
         self.engine = create_engine(f'sqlite:///{sqlite_path}', echo=True)  # future=True,
-        #Session = sessionmaker(self.engine)
+        #Session = sessionmaker(self.engine)"
         self.Session = sessionmaker(self.engine)
+
+
         #Session.configure(bind=self.engine)
         #self.session = Session()
 
