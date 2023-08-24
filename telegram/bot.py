@@ -69,13 +69,14 @@ async def main():
                                 user_id=subscription.user_id,
                                 region=subscription.region_id,
                                 session=_session,
-                                commit=False)
+                                )#commit=False)
+                            logger.info(f"notification for user {subscription.user_id} "
+                                    f"with region {subscription.region_id} was successful sent")
                         # 20 messages per second (Limit: 30 messages per second)
                         await asyncio.sleep(.05)
                 finally:
                     if subscriptions:
-                        logger.info(f"notification for user {subscription.user_id} "
-                                    f"with region {subscription.region_id} was successful sent")
+                        logger.info(f"all notifications was successful sent")
                     else:
                         logger.info(f"no any notifications to send")
 
@@ -91,7 +92,7 @@ async def main():
             await init_db(session)
 
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(send_notifications, 'interval', hours=1)
+    scheduler.add_job(send_notifications, 'interval', minutes=1)#hours=1)
     scheduler.start()
 
     try:
