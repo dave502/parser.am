@@ -33,7 +33,7 @@ import glob
 logger = logging.getLogger(TG_LOGGER_NAME)
 PRICE_FOR_REGION = 10
 ADMIN_ID = 180328814
-ZIPJSON_KEY = 'base64(zip(o))'
+#ZIPJSON_KEY = 'base64(zip(o))'
 
 router = Router()
 active_regions: dict[int:str] = {}
@@ -140,7 +140,7 @@ async def clb_active_regions(callback: CallbackQuery, state: FSMContext, session
     :return:
     """
     # clear the previous menu buttons
-    await callback.message.reply_markup.inline_keyboard.clear()
+    callback.message.reply_markup.inline_keyboard.clear()
     await callback.message.edit_reply_markup(callback.inline_message_id, callback.message.reply_markup)
 
     # update list of active regions from database
@@ -631,6 +631,14 @@ async def show_users(msg: Message, session: AsyncSession):
 @router.message(F.text == "Удалиться")
 async def delete_user(msg: Message, session: AsyncSession):
     await UserQuery.delete_user(msg.from_user.id, session)
+
+
+@router.message(F.text == "▶️ Start cron")
+async def show_users(msg: Message, session: AsyncSession):
+    if msg.from_user.id == ADMIN_ID:
+        app_path = pathlib.Path(__file__).parent.resolve().parents[0]
+        cron_log = app_path / 'logs/cron.log'
+        os.system("/usr/local/bin/python /bot/reestr_parser/crawl.py")
 
 
 @router.message(F.text == "⏲ Лог cron")
