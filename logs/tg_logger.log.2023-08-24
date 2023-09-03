@@ -1,0 +1,24 @@
+2023-08-24 07:10:02,063 - tg_logger - INFO - Logger has been initialized
+2023-08-24 07:10:04,337 - tg_logger - INFO - Bot started
+2023-08-24 07:12:35,136 - tg_logger - INFO - Logger has been initialized
+2023-08-24 07:12:37,160 - tg_logger - INFO - Bot started
+2023-08-24 07:51:30,171 - tg_logger - INFO - Logger has been initialized
+2023-08-24 07:51:32,287 - tg_logger - INFO - Bot started
+2023-08-24 07:52:32,335 - tg_logger - INFO - Scheduled notifications sending starts
+2023-08-24 07:52:43,858 - tg_logger - INFO - Sending message to user 180328814
+2023-08-24 07:52:44,466 - tg_logger - INFO - Target [ID:180328814]: success
+2023-08-24 07:55:54,574 - tg_logger - INFO - notification for user 180328814 with region 3 was successful sent
+2023-08-24 07:55:59,488 - tg_logger - INFO - Sending message to user 180328814
+2023-08-24 07:56:00,441 - tg_logger - INFO - Target [ID:180328814]: success
+2023-08-24 07:57:25,471 - tg_logger - INFO - Logger has been initialized
+2023-08-24 07:57:27,843 - tg_logger - INFO - Bot started
+2023-08-24 07:58:27,984 - tg_logger - INFO - Scheduled notifications sending starts
+2023-08-24 07:58:28,340 - tg_logger - INFO - Sending message to user 180328814
+2023-08-24 07:58:29,034 - tg_logger - INFO - Target [ID:180328814]: success
+2023-08-24 07:58:35,951 - tg_logger - INFO - notification for user 180328814 with region 3 was successful sent
+2023-08-24 07:58:38,410 - tg_logger - INFO - Sending message to user 180328814
+2023-08-24 07:58:38,553 - tg_logger - INFO - Target [ID:180328814]: success
+2023-08-24 07:58:42,797 - tg_logger - INFO - notification for user 180328814 with region 11 was successful sent
+2023-08-24 07:58:44,518 - tg_logger - INFO - all notifications was successful sent
+2023-08-24 07:59:27,882 - tg_logger - INFO - Scheduled notifications sending starts
+2023-08-24 07:59:27,965 - tg_logger - INFO - no any notifications to send

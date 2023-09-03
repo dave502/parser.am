@@ -203,8 +203,8 @@ class ReestrParserPipeline:
                         #     logger.debug(f"There are more then one day to report's final date remains for "
                         #                 f"region {item['region']}. The region was activated")
 
-                    RegionQuery.sync_set_region_active(item['region'], session, region_is_active)
-                    logger.debug(f"region {item['region']} set " + "activated" if region_is_active else "deactivated")
+                RegionQuery.sync_set_region_active(item['region'], session, region_is_active)
+                logger.debug(f"region {item['region']} set to activated" if region_is_active else "deactivated")
 
             if save_item_to_db:
 

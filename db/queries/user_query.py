@@ -28,3 +28,9 @@ class UserQuery:
         q = await session.execute(select(User).where(User.id == user_id))
         return q.scalars().one_or_none()
 
+    @staticmethod
+    async def delete_user(user_id: int, session: AsyncSession) ->  None:
+        user = await session.get(User, user_id)
+        if user:
+            await session.delete(user)
+            await session.commit()

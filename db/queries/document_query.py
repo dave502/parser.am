@@ -23,7 +23,6 @@ class DocumentQuery:
     @staticmethod
     async def get_document_by_region_id(region_id: int, session: AsyncSession) -> Document | None:
         q = await session.execute(select(Document).where(Document.region_id == region_id).
-                            options(selectinload(Document.region)).
                             order_by(Document.update_date.desc()))
         return q.scalars().first()
 

@@ -8,7 +8,6 @@ import os
 import pathlib
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-
 from aiogram import types, F, Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
@@ -16,11 +15,13 @@ from aiogram.methods.answer_pre_checkout_query import AnswerPreCheckoutQuery
 from aiogram.types import Message, ContentType
 from aiogram.types.callback_query import CallbackQuery
 from aiogram.types.input_file import FSInputFile
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import StatesGroup, State
 
 from sqlalchemy.ext.asyncio import AsyncSession
 import telegram.messages as msgs
 
-from db.queries import RegionQuery, SubscriptionQuery, PaymentQuery, UserQuery
+from db.queries import RegionQuery, SubscriptionQuery, PaymentQuery, UserQuery, DocumentQuery
 
 from telegram import kb
 from telegram.config import config
@@ -30,8 +31,9 @@ from logger.logger import TG_LOGGER_NAME, PROCEDURES_LOGGER_NAME, REGION_CHANGES
 import glob
 
 logger = logging.getLogger(TG_LOGGER_NAME)
-PRICE_FOR_REGION = 100
+PRICE_FOR_REGION = 10
 ADMIN_ID = 180328814
+ZIPJSON_KEY = 'base64(zip(o))'
 
 router = Router()
 active_regions: dict[int:str] = {}
@@ -49,6 +51,45 @@ async def get_active_regions(session: AsyncSession):
         logger.debug(f"{len(active_regions)} active_regions")
     except Exception as e:
         logger.critical(f"An error occurred while creating a record with user in the database! {e}")
+
+
+class Ordering(StatesGroup):
+    selecting_regions = State()
+    paying = State()
+    paying_success = State()
+
+
+# import zlib, base64
+# def json_zip(j):
+#     j = {
+#         ZIPJSON_KEY: base64.b64encode(
+#             zlib.compress(
+#                 json.dumps(j).encode('utf-8')
+#             )
+#         ).decode('ascii')
+#     }
+#     return j
+
+
+# def json_unzip(j, insist=True):
+#     try:
+#         assert (j[ZIPJSON_KEY])
+#         assert (set(j.keys()) == {ZIPJSON_KEY})
+#     except:
+#         if insist:
+#             raise RuntimeError("JSON not in the expected format {" + str(ZIPJSON_KEY) + ": zipstring}")
+#         else:
+#             return j
+#     try:
+#         j = zlib.decompress(base64.b64decode(j[ZIPJSON_KEY]))
+#     except:
+#         raise RuntimeError("Could not decode/unzip the contents")
+
+#     try:
+#         j = json.loads(j)
+#     except:
+#         raise RuntimeError("Could interpret the unzipped contents")
+#     return j
 
 
 async def show_contract(msg: Message, user_id: int, session: AsyncSession):
@@ -99,13 +140,14 @@ async def clb_active_regions(callback: CallbackQuery, state: FSMContext, session
     :return:
     """
     # clear the previous menu buttons
-    callback.message.reply_markup.inline_keyboard.clear()
+    await callback.message.reply_markup.inline_keyboard.clear()
     await callback.message.edit_reply_markup(callback.inline_message_id, callback.message.reply_markup)
 
     # update list of active regions from database
     await get_active_regions(session)
     if len(active_regions):
         # show list of active regions
+        #regions = [f"<a href={DocumentQuery.get_document_by_region_id(id).url}>{name}</a>" for id, name in active_regions]
         await callback.message.answer(text=msgs.active_regions_title + "\n⦁" +
                                            "\n⦁".join(active_regions.values()))
     else:
@@ -115,7 +157,7 @@ async def clb_active_regions(callback: CallbackQuery, state: FSMContext, session
 
 
 @router.callback_query(kb.CheckedCallbackFactory.filter(F.action == "check"))
-async def clb_check_regions(callback: CallbackQuery, callback_data: kb.CheckedCallbackFactory, session: AsyncSession):
+async def clb_check_regions(callback: CallbackQuery, callback_data: kb.CheckedCallbackFactory, session: AsyncSession, state: FSMContext):
     """
     Обработка выбора регионов
     :param session:
@@ -123,6 +165,10 @@ async def clb_check_regions(callback: CallbackQuery, callback_data: kb.CheckedCa
     :param callback_data:
     :return:
     """
+
+    await state.clear()
+    await state.set_state(Ordering.selecting_regions)
+
     # update list of active regions from database
     await get_active_regions(session)
 
@@ -169,7 +215,7 @@ async def clb_check_regions(callback: CallbackQuery, callback_data: kb.CheckedCa
 
 
 @router.callback_query(kb.CheckedCallbackFactory.filter(F.action == "pay"))
-async def clb_make_payment(callback: CallbackQuery, callback_data: kb.CheckedCallbackFactory, session: AsyncSession):
+async def clb_make_payment(callback: CallbackQuery, callback_data: kb.CheckedCallbackFactory, session: AsyncSession, state: FSMContext):
     global active_regions
     """
     Отправка платежа после подтверждения выбора регионов
@@ -177,6 +223,9 @@ async def clb_make_payment(callback: CallbackQuery, callback_data: kb.CheckedCal
     :param callback_data:
     :return:
     """
+
+    await state.set_state(Ordering.paying)
+
     if not active_regions:
         await get_active_regions(session)
     if not active_regions:
@@ -228,37 +277,44 @@ async def clb_make_payment(callback: CallbackQuery, callback_data: kb.CheckedCal
         'regions': selected_regions
     }
 
+    await state.update_data(payload=json.dumps(payload_dict))
+
+    del payload_dict['regions']
+
     # string with selected regions' names
     selected_regions_names_list = ', '.join([active_regions[reg] for reg in selected_regions])
 
     # if testing payment
     if payment_token.split(':')[1] == 'TEST':
-        # await callback.message.answer('pre_buy_demo_alert')
-        await callback.message.answer_invoice(title=msgs.payment_title,
-                                              description=msgs.payment_desc + selected_regions_names_list,
-                                              provider_token=payment_token,
-                                              currency=msgs.currency,
-                                              is_flexible=False,  # True если конечная цена зависит от способа доставки
-                                              prices=[total],
-                                              start_parameter='time-machine-example',
-                                              payload=json.dumps(payload_dict),
-                                              need_email=True,
-                                              send_email_to_provider=True,
-                                              provider_data=f'{{'
-                                                            f'"receipt":{{'
-                                              # f'"email":"example@example.com", '
-                                                            f'"items":[{{'
-                                                            f'"description": "{msgs.payment_title}",'
-                                                            f'"quantity": "1.00",'
-                                                            f'"amount":{{ '
-                                                            f'"value": "{callback_data.value}",'
-                                                            f'"currency" : "{msgs.currency.upper()}"'
-                                                            f'}},'
-                                                            f'"vat_code": 1'
-                                                            f'}}'
-                                                            f']}}'
-                                                            f'}}'
+        try:
+            # await callback.message.answer('pre_buy_demo_alert')
+            await callback.message.answer_invoice(title=msgs.payment_title,
+                                                description=msgs.payment_desc + selected_regions_names_list,
+                                                provider_token=payment_token,
+                                                currency=msgs.currency,
+                                                is_flexible=False,  # True если конечная цена зависит от способа доставки
+                                                prices=[total],
+                                                start_parameter='time-machine-example',
+                                                payload=json.dumps(payload_dict),
+                                                need_email=True,
+                                                send_email_to_provider=True,
+                                                provider_data=f'{{'
+                                                                f'"receipt":{{'
+                                                # f'"email":"example@example.com", '
+                                                                f'"items":[{{'
+                                                                f'"description": "{msgs.payment_title}",'
+                                                                f'"quantity": "1.00",'
+                                                                f'"amount":{{ '
+                                                                f'"value": "{callback_data.value}",'
+                                                                f'"currency" : "{msgs.currency.upper()}"'
+                                                                f'}},'
+                                                                f'"vat_code": 1'
+                                                                f'}}'
+                                                                f']}}'
+                                                                f'}}'
                                               )
+        except Exception as e:
+            logger.critical(f"Error {e} while user {callback.from_user.id} sent payment {callback_data.value} {msgs.currency}")
     logger.info(f"user {callback.from_user.id} sent payment {callback_data.value} {msgs.currency}")
     await callback.answer()
 
@@ -385,6 +441,7 @@ async def cmd_active_regions(msg: Message, session: AsyncSession):
     """
     await get_active_regions(session)
     if len(active_regions):
+        #regions = [f"<a href='{(await DocumentQuery.get_document_by_region_id(id, session)).url}'>{name}</a>" for id, name in active_regions.items()]
         await msg.answer(text=msgs.active_regions_title + "\n⦁" +
                               "\n⦁".join(active_regions.values()))
     else:
@@ -425,7 +482,7 @@ async def cmd_choose_regions(msg: Message, session: AsyncSession):
 
 
 @router.message(lambda msg: msg.content_type == ContentType.SUCCESSFUL_PAYMENT)
-async def process_successful_payment(msg: Message, session: AsyncSession):
+async def process_successful_payment(msg: Message, session: AsyncSession, state: FSMContext):
     """
     вызывается после подтверждения приёма платежа от платёжной системы
     :param msg:
@@ -458,7 +515,12 @@ async def process_successful_payment(msg: Message, session: AsyncSession):
         return
 
     # get payload with the all user's order information
-    payload = json.loads(payment_info.get('invoice_payload'))
+    # payload = json.loads(payment_info.get('invoice_payload'))
+
+    payment_data = await state.get_data()
+    payload = json.loads(payment_data["payload"])
+    await state.clear()
+
     payment_time = datetime.fromisoformat(payload['date'])
 
     # обновить информацию о подписках для каждого региона
@@ -554,10 +616,9 @@ async def show_users(msg: Message, session: AsyncSession):
         log_path = app_path / "logs"
         print(log_path)
         files = list(filter(os.path.isfile, glob.glob(str(log_path) + "/*.csv")))
-        print(files)
-        print(max(files))
         log = FSInputFile(max(files))
         await msg.answer_document(log)
+
 
 @router.message(F.text == "Изменения")
 async def show_users(msg: Message, session: AsyncSession):
@@ -565,6 +626,11 @@ async def show_users(msg: Message, session: AsyncSession):
         app_path = pathlib.Path(__file__).parent.resolve().parents[0]
         log = FSInputFile(f'{app_path}/logs/{REGION_CHANGES}.log')
         await msg.answer_document(log)
+
+
+@router.message(F.text == "Удалиться")
+async def delete_user(msg: Message, session: AsyncSession):
+    await UserQuery.delete_user(msg.from_user.id, session)
 
 
 @router.message(F.text == "⏲ Лог cron")

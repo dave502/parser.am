@@ -92,7 +92,7 @@ async def main():
             await init_db(session)
 
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(send_notifications, 'interval', minutes=1)#hours=1)
+    scheduler.add_job(send_notifications, 'interval', hours=1) # minutes=1)#
     scheduler.start()
 
     try:
