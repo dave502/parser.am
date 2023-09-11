@@ -32,7 +32,7 @@ import glob
 
 logger = logging.getLogger(TG_LOGGER_NAME)
 PRICE_FOR_REGION = 10
-ADMIN_ID = 180328814
+ADMIN_IDS = [180328814, 221434435]
 #ZIPJSON_KEY = 'base64(zip(o))'
 
 router = Router()
@@ -57,39 +57,6 @@ class Ordering(StatesGroup):
     selecting_regions = State()
     paying = State()
     paying_success = State()
-
-
-# import zlib, base64
-# def json_zip(j):
-#     j = {
-#         ZIPJSON_KEY: base64.b64encode(
-#             zlib.compress(
-#                 json.dumps(j).encode('utf-8')
-#             )
-#         ).decode('ascii')
-#     }
-#     return j
-
-
-# def json_unzip(j, insist=True):
-#     try:
-#         assert (j[ZIPJSON_KEY])
-#         assert (set(j.keys()) == {ZIPJSON_KEY})
-#     except:
-#         if insist:
-#             raise RuntimeError("JSON not in the expected format {" + str(ZIPJSON_KEY) + ": zipstring}")
-#         else:
-#             return j
-#     try:
-#         j = zlib.decompress(base64.b64decode(j[ZIPJSON_KEY]))
-#     except:
-#         raise RuntimeError("Could not decode/unzip the contents")
-
-#     try:
-#         j = json.loads(j)
-#     except:
-#         raise RuntimeError("Could interpret the unzipped contents")
-#     return j
 
 
 async def show_contract(msg: Message, user_id: int, session: AsyncSession):
@@ -572,13 +539,13 @@ async def cmd_show_subscription_info(msg: Message, session: AsyncSession):
 
 @router.message(Command("adminpanel"))
 async def cmd_start(msg: Message):
-    if msg.from_user.id == ADMIN_ID:
+    if msg.from_user.id in ADMIN_IDS:
         await msg.answer('Добро пожаловать в Админ-Панель!', reply_markup=kb.admin_menu())
 
 
 @router.message(F.text == "👨 Пользователи")
 async def show_users(msg: Message, session: AsyncSession):
-    if msg.from_user.id == ADMIN_ID:
+    if msg.from_user.id in ADMIN_IDS:
         users = await UserQuery.get_all_users(session)
         await msg.answer(f'Всего {len(users)} зарегистрированных пользователей: ' + "\n" +
                          "\n⦁".join([f'{user.id} : {user.registration_time}' for user in users]))
@@ -586,7 +553,7 @@ async def show_users(msg: Message, session: AsyncSession):
 
 @router.message(F.text == "💳 Оплаты")
 async def show_users(msg: Message, session: AsyncSession):
-    if msg.from_user.id == ADMIN_ID:
+    if msg.from_user.id in ADMIN_IDS:
         payments = await PaymentQuery.get_all_payments(session)
         await msg.answer(f'Список всех платежей: ' + "\n⦁" +
                          "\n⦁".join([f'user {payment.user_id} : date {payment.date} : sum {payment.amount / 100}'
@@ -595,7 +562,7 @@ async def show_users(msg: Message, session: AsyncSession):
 
 @router.message(F.text == "📃 Лог telegram")
 async def show_users(msg: Message, session: AsyncSession):
-    if msg.from_user.id == ADMIN_ID:
+    if msg.from_user.id in ADMIN_IDS:
         app_path = pathlib.Path(__file__).parent.resolve().parents[0]
         log = FSInputFile(f'{app_path}/logs/{TG_LOGGER_NAME}.log')
         await msg.answer_document(log)
@@ -603,7 +570,7 @@ async def show_users(msg: Message, session: AsyncSession):
 
 @router.message(F.text == "Все процедуры")
 async def show_users(msg: Message, session: AsyncSession):
-    if msg.from_user.id == ADMIN_ID:
+    if msg.from_user.id in ADMIN_IDS:
         app_path = pathlib.Path(__file__).parent.resolve().parents[0]
         log = FSInputFile(f'{app_path}/logs/{PROCEDURES_LOGGER_NAME}.log')
         await msg.answer_document(log)
@@ -611,7 +578,7 @@ async def show_users(msg: Message, session: AsyncSession):
 
 @router.message(F.text == "Все Регионы")
 async def show_users(msg: Message, session: AsyncSession):
-    if msg.from_user.id == ADMIN_ID:
+    if msg.from_user.id in ADMIN_IDS:
         app_path = pathlib.Path(__file__).parent.resolve().parents[0]
         log_path = app_path / "logs"
         print(log_path)
@@ -622,28 +589,27 @@ async def show_users(msg: Message, session: AsyncSession):
 
 @router.message(F.text == "Изменения")
 async def show_users(msg: Message, session: AsyncSession):
-    if msg.from_user.id == ADMIN_ID:
+    if msg.from_user.id in ADMIN_IDS:
         app_path = pathlib.Path(__file__).parent.resolve().parents[0]
         log = FSInputFile(f'{app_path}/logs/{REGION_CHANGES}.log')
         await msg.answer_document(log)
 
 
-@router.message(F.text == "Удалиться")
+@router.message(F.text == "❌ Удалиться")
 async def delete_user(msg: Message, session: AsyncSession):
-    await UserQuery.delete_user(msg.from_user.id, session)
+    if msg.from_user.id in ADMIN_IDS:
+        await UserQuery.delete_user(msg.from_user.id, session)
 
 
 @router.message(F.text == "▶️ Start cron")
 async def show_users(msg: Message, session: AsyncSession):
-    if msg.from_user.id == ADMIN_ID:
-        app_path = pathlib.Path(__file__).parent.resolve().parents[0]
-        cron_log = app_path / 'logs/cron.log'
+    if msg.from_user.id in ADMIN_IDS:
         os.system("/usr/local/bin/python /bot/reestr_parser/crawl.py")
 
 
 @router.message(F.text == "⏲ Лог cron")
 async def show_users(msg: Message, session: AsyncSession):
-    if msg.from_user.id == ADMIN_ID:
+    if msg.from_user.id in ADMIN_IDS:
         app_path = pathlib.Path(__file__).parent.resolve().parents[0]
         cron_log = app_path / 'logs/cron.log'
         if os.stat(cron_log).st_size == 0:
@@ -655,5 +621,5 @@ async def show_users(msg: Message, session: AsyncSession):
 
 @router.message(F.text == "◀️ Выйти")
 async def show_users(msg: Message, session: AsyncSession):
-    if msg.from_user.id == ADMIN_ID:
+    if msg.from_user.id in ADMIN_IDS:
         await msg.answer(text="Выход", reply_markup=types.ReplyKeyboardRemove())
