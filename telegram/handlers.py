@@ -31,7 +31,9 @@ from logger.logger import TG_LOGGER_NAME, PROCEDURES_LOGGER_NAME, REGION_CHANGES
 import glob
 
 logger = logging.getLogger(TG_LOGGER_NAME)
-PRICE_FOR_REGION = 10
+PRICE_FOR_REGION = 1000
+PRICE_FOR_REGION_2_10 = 500
+PRICE_FOR_REGION_11_ = 500
 ADMIN_IDS = [180328814, 221434435]
 #ZIPJSON_KEY = 'base64(zip(o))'
 
@@ -158,9 +160,20 @@ async def clb_check_regions(callback: CallbackQuery, callback_data: kb.CheckedCa
         # add updated region list back to new_reply_markup (pack() transforms callback_data to string)
         new_reply_markup.inline_keyboard[index][0].callback_data = callback_data.pack()
 
-        # calculate the total sum of checked regions
-        total = sum([PRICE_FOR_REGION for item in callback.message.reply_markup.inline_keyboard
-                     if 'True' in item[0].callback_data])
+        # # calculate the total sum of checked regions
+        # total = sum([PRICE_FOR_REGION for item in callback.message.reply_markup.inline_keyboard
+        #              if 'True' in item[0].callback_data])
+        ordered_regions = [True for item in callback.message.reply_markup.inline_keyboard
+                        if 'True' in item[0].callback_data]
+        len_ordered_regions = len(ordered_regions)
+        total = 0
+        if len_ordered_regions:
+            total = PRICE_FOR_REGION
+            if (orders_11_ := len_ordered_regions - 10) > 0:
+                total += orders_11_ * PRICE_FOR_REGION_11_ + (len_ordered_regions-orders_11_-1)*PRICE_FOR_REGION_2_10
+            elif len_ordered_regions > 1:
+                 total += (len_ordered_regions-1) * PRICE_FOR_REGION_2_10
+
 
         # set calculated sum to the callback value of the last button of list
         total_callback = kb.CheckedCallbackFactory.unpack(new_reply_markup.inline_keyboard[-1][0].callback_data)
