@@ -31,7 +31,7 @@ from logger.logger import TG_LOGGER_NAME, PROCEDURES_LOGGER_NAME, REGION_CHANGES
 import glob
 
 logger = logging.getLogger(TG_LOGGER_NAME)
-PRICE_FOR_REGION = 1000
+PRICE_FOR_REGION = 100
 PRICE_FOR_REGION_2_10 = 500
 PRICE_FOR_REGION_11_ = 100
 ADMIN_IDS = [180328814, 221434435]
@@ -56,9 +56,11 @@ async def get_active_regions(session: AsyncSession):
 
 
 class Ordering(StatesGroup):
+    start = State()
     selecting_regions = State()
     paying = State()
     paying_success = State()
+
 
 
 async def show_contract(msg: Message, user_id: int, session: AsyncSession):
@@ -135,9 +137,6 @@ async def clb_check_regions(callback: CallbackQuery, callback_data: kb.CheckedCa
     :return:
     """
 
-    await state.clear()
-    await state.set_state(Ordering.selecting_regions)
-
     # update list of active regions from database
     await get_active_regions(session)
 
@@ -204,8 +203,6 @@ async def clb_make_payment(callback: CallbackQuery, callback_data: kb.CheckedCal
     :return:
     """
 
-    await state.set_state(Ordering.paying)
-
     if not active_regions:
         await get_active_regions(session)
     if not active_regions:
@@ -249,14 +246,19 @@ async def clb_make_payment(callback: CallbackQuery, callback_data: kb.CheckedCal
     # payment token  for payment system
     payment_token = config.payments_provider_token.get_secret_value()
 
+    state_data = await state.get_data()
+    referrer = state_data.get("referrer")
+
     # payload dict  for payment system
     payload_dict = {
         'user': callback.from_user.id,
         'sum': callback_data.value,
         'date': datetime.now().isoformat(),
-        'regions': selected_regions
+        'regions': selected_regions,
+        'referrer': referrer
     }
 
+    state.set_state(Ordering.paying)
     await state.update_data(payload=json.dumps(payload_dict))
 
     del payload_dict['regions']
@@ -278,11 +280,13 @@ async def clb_make_payment(callback: CallbackQuery, callback_data: kb.CheckedCal
                                                 payload=json.dumps(payload_dict),
                                                 need_email=True,
                                                 send_email_to_provider=True,
+
                                                 provider_data=f'{{'
                                                                 f'"receipt":{{'
                                                 # f'"email":"example@example.com", '
                                                                 f'"items":[{{'
                                                                 f'"description": "{msgs.payment_title}",'
+
                                                                 f'"quantity": "1.00",'
                                                                 f'"amount":{{ '
                                                                 f'"value": "{callback_data.value}",'
@@ -402,7 +406,7 @@ async def clb_accept_contract(callback: CallbackQuery, state: FSMContext, sessio
 
 
 @router.message(Command("start"))
-async def cmd_start(msg: Message):
+async def cmd_start(msg: Message, state: FSMContext):
     """
     выводит стартовое меню:
         - инфо о работе бота
@@ -411,6 +415,11 @@ async def cmd_start(msg: Message):
     :param msg:
     :return:
     """
+    state.set_state(Ordering.start)
+    if " " in msg.text:
+        referrer = msg.text.split()[1]
+        await state.update_data(referrer=referrer)
+
     await msg.answer(msgs.greetings.format(name=msg.from_user.full_name), reply_markup=kb.first_menu)
 
 
@@ -516,8 +525,7 @@ async def process_successful_payment(msg: Message, session: AsyncSession, state:
         return
 
     # get payload with the all user's order information
-    # payload = json.loads(payment_info.get('invoice_payload'))
-
+    refferer = json.loads(payment_info['invoice_payload']).get('referrer')
     payment_data = await state.get_data()
     payload = json.loads(payment_data["payload"])
     await state.clear()
