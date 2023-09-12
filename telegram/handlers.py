@@ -346,6 +346,18 @@ async def clb_bot_info(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 
+@router.callback_query(F.data == "pricelist")
+async def clb_bot_info(callback: CallbackQuery, state: FSMContext):
+    """
+    Вывод ссылки на ценовой лист
+    :param callback:
+    :param state:
+    :return:
+    """
+    await callback.message.answer(msgs.pricelist)
+
+
+
 @router.callback_query(F.data == "accept_contract")
 async def clb_accept_contract(callback: CallbackQuery, state: FSMContext, session: AsyncSession):
     """
@@ -435,6 +447,15 @@ async def cmd_show_contract(msg: Message, session: AsyncSession):
     :return:
     """
     await show_contract(msg, msg.from_user.id, session)
+
+
+@router.message(Command("pricelist"))
+async def cmd_show_contract(msg: Message, session: AsyncSession):
+    """
+    Показать текст контракта
+    :return:
+    """
+    await msg.answer(text=msgs.pricelist)
 
 
 @router.message(Command("regions"))

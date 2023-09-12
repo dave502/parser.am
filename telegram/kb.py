@@ -33,6 +33,7 @@ def admin_menu() -> ReplyKeyboardMarkup:
 first_menu = [
     [InlineKeyboardButton(text="ℹ️ Узнать подробности о работе бота", callback_data="bot_info")],
     [InlineKeyboardButton(text="🧾 Открыть договор об оказании услуг", callback_data="contract")],
+    [InlineKeyboardButton(text="💳 Цены", callback_data="pricelist")],
     [InlineKeyboardButton(text="🔎 Список доступных регионов", callback_data="active_regions")],
 ]
 first_menu = InlineKeyboardMarkup(inline_keyboard=first_menu)
