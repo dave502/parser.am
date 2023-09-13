@@ -527,7 +527,7 @@ async def cmd_show_contract(msg: Message, session: AsyncSession):
     Показать текст контракта
     :return:
     """
-    await msg.answer(text=msgs.pricelist)
+    await msg.answer(text=msgs.tech_support)
 
 
 
