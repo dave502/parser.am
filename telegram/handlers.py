@@ -334,20 +334,20 @@ async def clb_show_contract(callback: CallbackQuery, state: FSMContext, session:
     await callback.answer()
 
 
-@router.callback_query(F.data == "bot_info")
-async def clb_bot_info(callback: CallbackQuery, state: FSMContext):
-    """
-    Вывод информации о боте
-    :param callback:
-    :param state:
-    :return:
-    """
-    # clear previous menu
-    callback.message.reply_markup.inline_keyboard.clear()
-    await callback.message.edit_reply_markup(callback.inline_message_id, callback.message.reply_markup)
-    # show bot info
-    await callback.message.answer(msgs.bot_info, reply_markup=kb.second_menu)
-    await callback.answer()
+# @router.callback_query(F.data == "bot_info")
+# async def clb_bot_info(callback: CallbackQuery, state: FSMContext):
+#     """
+#     Вывод информации о боте
+#     :param callback:
+#     :param state:
+#     :return:
+#     """
+#     # clear previous menu
+#     callback.message.reply_markup.inline_keyboard.clear()
+#     await callback.message.edit_reply_markup(callback.inline_message_id, callback.message.reply_markup)
+#     # show bot info
+#     await callback.message.answer(msgs.bot_info, reply_markup=kb.second_menu)
+#     await callback.answer()
 
 
 @router.callback_query(F.data == "pricelist")
@@ -465,9 +465,9 @@ async def cmd_show_contract(msg: Message, session: AsyncSession):
 
 @router.message(F.text == "💳 Цены")
 @router.message(Command("pricelist"))
-async def cmd_show_contract(msg: Message, session: AsyncSession):
+async def cmd_show_pricelist(msg: Message, session: AsyncSession):
     """
-    Показать текст контракта
+    Показать прайслист
     :return:
     """
     await msg.answer(text=msgs.pricelist)
@@ -521,8 +521,7 @@ async def cmd_show_subscription_info(msg: Message, session: AsyncSession):
 
 
 @router.message(F.text == "📇 Поддержка")
-@router.message(Command("pricelist"))
-async def cmd_show_contract(msg: Message, session: AsyncSession):
+async def cmd_tech_support(msg: Message, session: AsyncSession):
     """
     Показать текст контракта
     :return:
