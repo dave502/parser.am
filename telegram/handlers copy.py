@@ -420,12 +420,9 @@ async def cmd_start(msg: Message, state: FSMContext):
         referrer = msg.text.split()[1]
         await state.update_data(referrer=referrer)
 
-    await msg.answer(msgs.greetings.format(name=msg.from_user.full_name), reply_markup=kb.user_menu())
-
-    #await msg.answer(msgs.greetings.format(name=msg.from_user.full_name), reply_markup=kb.first_menu)
+    await msg.answer(msgs.greetings.format(name=msg.from_user.full_name), reply_markup=kb.first_menu)
 
 
-@router.message(F.text == "ℹ️ О боте")
 @router.message(Command("bot_info"))
 async def cmd_bot_info(msg: Message):
     """
@@ -435,7 +432,6 @@ async def cmd_bot_info(msg: Message):
     await msg.answer(msgs.bot_info)
 
 
-@router.message(F.text == "🔎 Доступные регионы")
 @router.message(Command("active_regions"))
 async def cmd_active_regions(msg: Message, session: AsyncSession):
     """
@@ -453,7 +449,6 @@ async def cmd_active_regions(msg: Message, session: AsyncSession):
         await msg.answer(text=msgs.no_active_regions_title)
 
 
-@router.message(F.text == "🧾 Договор")
 @router.message(Command("contract"))
 async def cmd_show_contract(msg: Message, session: AsyncSession):
     """
@@ -463,7 +458,6 @@ async def cmd_show_contract(msg: Message, session: AsyncSession):
     await show_contract(msg, msg.from_user.id, session)
 
 
-@router.message(F.text == "💳 Цены")
 @router.message(Command("pricelist"))
 async def cmd_show_contract(msg: Message, session: AsyncSession):
     """
@@ -473,8 +467,8 @@ async def cmd_show_contract(msg: Message, session: AsyncSession):
     await msg.answer(text=msgs.pricelist)
 
 
-@router.message(F.text == "☑️ Выбрать регионы")
 @router.message(Command("regions"))
+# @router.message(F.text == "Выбрать регионы")
 async def cmd_choose_regions(msg: Message, session: AsyncSession):
     """
     Вывод списка для выбора региона
@@ -495,40 +489,6 @@ async def cmd_choose_regions(msg: Message, session: AsyncSession):
             text="Для выбора регионов и дальнейшей оплаты необходимо согласиться с условиями договора аказания услуг",
             reply_markup=kb.agreement_menu)
     # await msg.answer(text=msgs.check_regions, reply_markup=kb.list_of_regions_kb)
-
-
-@router.message(F.text == "🗃️ Мои подписки")
-@router.message(Command("subs_info"))
-async def cmd_show_subscription_info(msg: Message, session: AsyncSession):
-    """
-    Вывод информации о подписке
-    :return:
-    """
-    user_subscriptions = None
-    try:
-        user_subscriptions = await SubscriptionQuery.get_user_subscriptions(msg.from_user.id, session)
-    except Exception as e:
-        logging.critical(f"An error occurred while getting subscriptions for user {msg.from_user.id} "
-                         f"from the database! {e}")
-    if user_subscriptions:
-        # show user's subscriptions
-        str_subs = '\n'.join(
-            [f"{subscription.region.name} по {subscription.end_time.date()}" for subscription in user_subscriptions])
-        await msg.answer(f"Ваши действующие подписки:\n" + str_subs)
-    else:
-        await msg.answer(f"сейчас у Вас нет действующих подписок")
-
-
-
-@router.message(F.text == "📇 Поддержка")
-@router.message(Command("pricelist"))
-async def cmd_show_contract(msg: Message, session: AsyncSession):
-    """
-    Показать текст контракта
-    :return:
-    """
-    await msg.answer(text=msgs.pricelist)
-
 
 
 @router.message(lambda msg: msg.content_type == ContentType.SUCCESSFUL_PAYMENT)
@@ -591,6 +551,27 @@ async def process_successful_payment(msg: Message, session: AsyncSession, state:
     await msg.answer(msgs.service_activated)
     # show user's subscriptions
     await cmd_show_subscription_info(msg, session)
+
+
+@router.message(Command("subs_info"))
+async def cmd_show_subscription_info(msg: Message, session: AsyncSession):
+    """
+    Вывод информации о подписке
+    :return:
+    """
+    user_subscriptions = None
+    try:
+        user_subscriptions = await SubscriptionQuery.get_user_subscriptions(msg.from_user.id, session)
+    except Exception as e:
+        logging.critical(f"An error occurred while getting subscriptions for user {msg.from_user.id} "
+                         f"from the database! {e}")
+    if user_subscriptions:
+        # show user's subscriptions
+        str_subs = '\n'.join(
+            [f"{subscription.region.name} по {subscription.end_time.date()}" for subscription in user_subscriptions])
+        await msg.answer(f"Ваши действующие подписки:\n" + str_subs)
+    else:
+        await msg.answer(f"сейчас у Вас нет действующих подписок")
 
 
 """
@@ -681,6 +662,6 @@ async def show_users(msg: Message, session: AsyncSession):
 
 
 @router.message(F.text == "◀️ Выйти")
-async def exit_kb(msg: Message, session: AsyncSession):
-    # if msg.from_user.id in ADMIN_IDS:
+async def show_users(msg: Message, session: AsyncSession):
+    if msg.from_user.id in ADMIN_IDS:
         await msg.answer(text="Выход", reply_markup=types.ReplyKeyboardRemove())

@@ -30,6 +30,32 @@ def admin_menu() -> ReplyKeyboardMarkup:
     return builder.as_markup()
 
 
+def user_menu() -> ReplyKeyboardMarkup:
+    builder = ReplyKeyboardBuilder()
+
+    # builder.row(
+    #     KeyboardButton(text="👨 Пользователи"),
+    #     KeyboardButton(text="💳 Оплаты"),
+    # )
+    builder.row(
+        KeyboardButton(text="🗃️ Мои подписки"),
+        KeyboardButton(text="🧾 Договор"),
+    )
+    builder.row(
+        KeyboardButton(text="☑️ Выбрать регионы"),
+        KeyboardButton(text="🔎 Доступные регионы"),
+    )
+    builder.row(
+        KeyboardButton(text="💳 Цены"),
+        KeyboardButton(text="ℹ️ О боте"),
+    )
+    builder.row(
+        KeyboardButton(text="📇 Поддержка"),
+        KeyboardButton(text="◀️ Выйти"),
+    )
+    return builder.as_markup()
+
+
 first_menu = [
     [InlineKeyboardButton(text="ℹ️ Узнать подробности о работе бота", callback_data="bot_info")],
     [InlineKeyboardButton(text="🧾 Открыть договор об оказании услуг", callback_data="contract")],
