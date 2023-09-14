@@ -111,6 +111,7 @@ if __name__ == "__main__":
     logger = setup_logger(TG_LOGGER_NAME, f'{app_path}/logs/{TG_LOGGER_NAME}.log')
     logger.info("Logger has been initialized")
 
+
     # set the path to db for alembic migration
     alembic_config = ConfigParser()
     alembic_config.read(f'{app_path}/db/alembic.ini')
@@ -118,6 +119,7 @@ if __name__ == "__main__":
     alembic_config.set('alembic', 'sqlalchemy.url', value=alembic_db_path)
     with open(f'{app_path}/db/alembic.ini', 'w') as alembic_ini:
         alembic_config.write(alembic_ini)
+        logger.debug(f"wroted {alembic_db_path} to {app_path}/db/alembic.ini")
 
     try:
         asyncio.run(main())
