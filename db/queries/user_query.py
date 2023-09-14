@@ -11,8 +11,10 @@ class UserQuery:
     #     self.commit = commit
 
     @staticmethod
-    async def create_user(user_id: int, registration_time: str, session: AsyncSession, commit: bool = True):
-        new_user = User(id=user_id, registration_time=registration_time, accepted_contract=True)
+    async def create_user(user_id: int, registration_time: str, session: AsyncSession,
+                          accepted_contract=False, referrer=None, commit: bool = True):
+        new_user = User(id=user_id, registration_time=registration_time,
+                        accepted_contract=accepted_contract, referrer=referrer)
         session.add(new_user)
         await session.flush()
         if commit:
@@ -34,3 +36,17 @@ class UserQuery:
         if user:
             await session.delete(user)
             await session.commit()
+
+
+    @staticmethod
+    def update_user(id: int, session: AsyncSession, updates:dict) -> int:
+        #with session.begin():
+        try:
+            q = update(User).where(User.id == id).values(updates)
+            q.execution_options(synchronize_session="fetch")
+            res: int = session.execute(q).rowcount
+        except Exception as e:
+            print(f"update error {e}")
+        session.commit()
+
+        return res

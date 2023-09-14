@@ -1,10 +1,13 @@
 #!/bin/bash
 
-# Start the first process
-python "./telegram/bot.py" &
+# # Start the first process
+# python "./telegram/bot.py" &
 
-# Start the second process
-./cron/crawl.sh &
+# run database migration
+(cd db; alembic upgrade head &)
+
+# # Start the second process
+# ./cron/crawl.sh &
 
 # Wait for any process to exit
 wait -n

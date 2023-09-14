@@ -14,10 +14,11 @@ from telegram.handlers import router
 from telegram.msgs import notice_text
 from aiogram.utils.callback_answer import CallbackAnswerMiddleware
 from db.init_db import new_db, init_db
-from db.config import async_session
+from db.config import async_session, DATABASE_URL
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from telegram.middlewares import DbSessionMiddleware
 from logger.logger import setup_logger, TG_LOGGER_NAME
+from configparser  import ConfigParser
 
 
 async def main():
@@ -104,9 +105,19 @@ async def main():
 
 
 if __name__ == "__main__":
+
+    # init telegram logger
     app_path = pathlib.Path(__file__).parent.resolve().parents[0]
     logger = setup_logger(TG_LOGGER_NAME, f'{app_path}/logs/{TG_LOGGER_NAME}.log')
     logger.info("Logger has been initialized")
+
+    # set the path to db for alembic migration
+    alembic_config = ConfigParser()
+    alembic_config.read(f'{app_path}/db/alembic.ini')
+    alembic_db_path = DATABASE_URL.replace("+aiosqlite", "")
+    alembic_config.set('alembic', 'sqlalchemy.url', value=alembic_db_path)
+    with open(f'{app_path}/db/alembic.ini', 'w') as alembic_ini:
+        alembic_config.write(alembic_ini)
 
     try:
         asyncio.run(main())

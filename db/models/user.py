@@ -7,6 +7,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True)
     registration_time = Column(String)
+    referrer = Column(String(10))
     accepted_contract = Column(Boolean, default=False)
 
     def __str__(self):

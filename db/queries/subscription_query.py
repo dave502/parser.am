@@ -56,7 +56,7 @@ class SubscriptionQuery:
             queries.append(Subscripton.end_time >= today)
         q = await session.execute(select(Subscripton).
                                   where(and_(*queries)).
-                                  order_by(Subscripton.end_time).options(selectinload(Subscripton.region)))
+                                  order_by(Subscripton.end_time).options(selectinload(Subscripton.region), selectinload(Subscripton.user)))
         return q.scalars().all()
 
     @staticmethod

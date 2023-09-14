@@ -78,7 +78,7 @@ async def show_contract(msg: Message, user_id: int, session: AsyncSession):
     except Exception as e:
         logger.critical(f"An error occurred while creating a record with user in the database! {e}")
 
-    if user:
+    if user and user.accepted_contract:
         # if user found just show him the contract
         await msg.answer(msgs.contract)
         await msg.answer(msgs.contract_accepted)
@@ -228,6 +228,7 @@ async def clb_make_payment(callback: CallbackQuery, callback_data: kb.CheckedCal
 
     # get current user's subscriptions
     user_subscriptions = await SubscriptionQuery.get_user_subscriptions(callback.from_user.id, session)
+    user = await UserQuery.get_user_by_id(callback.from_user.id, session)
 
     # stop if any of selected regions is in user's subscriptions
     intersection = list(set([subs.region.id for subs in user_subscriptions]) & set(selected_regions))
@@ -258,7 +259,7 @@ async def clb_make_payment(callback: CallbackQuery, callback_data: kb.CheckedCal
         'referrer': referrer
     }
 
-    state.set_state(Ordering.paying)
+    await state.set_state(Ordering.paying)
     await state.update_data(payload=json.dumps(payload_dict))
 
     del payload_dict['regions']
@@ -286,7 +287,7 @@ async def clb_make_payment(callback: CallbackQuery, callback_data: kb.CheckedCal
                                                 # f'"email":"example@example.com", '
                                                                 f'"items":[{{'
                                                                 f'"description": "{msgs.payment_title}",'
-
+                                                                f'"metadata": {{"referrer":"{user.referrer}"}},'
                                                                 f'"quantity": "1.00",'
                                                                 f'"amount":{{ '
                                                                 f'"value": "{callback_data.value}",'
@@ -375,7 +376,13 @@ async def clb_accept_contract(callback: CallbackQuery, state: FSMContext, sessio
 
     try:
         # if the user has accepted the contract put him in database
-        await UserQuery.create_user(callback.from_user.id, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), session)
+        user = await UserQuery.get_user_by_id(callback.from_user.id, session)
+        if user:
+            user.accepted_contract = True
+            await session.commit()
+            await session.flush()
+        else:
+            await UserQuery.create_user(callback.from_user.id, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), session, accepted_contract=True)
     except Exception as e:
         logging.critical(f"An error occurred while creating a record with user in the database! {e}")
         await callback.answer()
@@ -406,7 +413,7 @@ async def clb_accept_contract(callback: CallbackQuery, state: FSMContext, sessio
 
 
 @router.message(Command("start"))
-async def cmd_start(msg: Message, state: FSMContext):
+async def cmd_start(msg: Message, state: FSMContext, session: AsyncSession):
     """
     выводит стартовое меню:
         - инфо о работе бота
@@ -419,6 +426,16 @@ async def cmd_start(msg: Message, state: FSMContext):
     if " " in msg.text:
         referrer = msg.text.split()[1]
         await state.update_data(referrer=referrer)
+        try:
+            # if user came from referrer for the first time - write him to the database
+            user = await UserQuery.get_user_by_id(msg.from_user.id, session=session)
+            if not user:
+                await UserQuery.create_user(msg.from_user.id, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), \
+                                           session,  referrer=referrer)
+        except Exception as e:
+            logging.critical(f"An error occurred while creating a record with user in the database! {e}")
+            await callback.answer()
+            return
 
     await msg.answer(msgs.greetings.format(name=msg.from_user.full_name), reply_markup=kb.user_menu())
 
@@ -483,7 +500,7 @@ async def cmd_choose_regions(msg: Message, session: AsyncSession):
     :return:
     """
     user = await UserQuery.get_user_by_id(msg.from_user.id, session)
-    if user:
+    if user and user.accepted_contract:
         await get_active_regions(session)
         if len(active_regions):
             await msg.answer(text=msgs.active_regions_title)
@@ -513,7 +530,7 @@ async def cmd_show_subscription_info(msg: Message, session: AsyncSession):
     if user_subscriptions:
         # show user's subscriptions
         str_subs = '\n'.join(
-            [f"{subscription.region.name} по {subscription.end_time.date()}" for subscription in user_subscriptions])
+            [f"{subscription.region.name} по {subscription.end_time.strftime('%d/%m/%Y')}" for subscription in user_subscriptions])
         await msg.answer(f"Ваши действующие подписки:\n" + str_subs)
     else:
         await msg.answer(f"сейчас у Вас нет действующих подписок")
@@ -564,22 +581,24 @@ async def process_successful_payment(msg: Message, session: AsyncSession, state:
         return
 
     # get payload with the all user's order information
-    refferer = json.loads(payment_info['invoice_payload']).get('referrer')
-    payment_data = await state.get_data()
-    payload = json.loads(payment_data["payload"])
+    invoice_payload = json.loads(payment_info['invoice_payload'])
+    referrer = invoice_payload.get("referrer")
+
+    state_data = await state.get_data()
+    state_payload = json.loads(state_data["payload"])
     await state.clear()
 
-    payment_time = datetime.fromisoformat(payload['date'])
+    payment_time = datetime.fromisoformat(invoice_payload.get('date'))
 
     # обновить информацию о подписках для каждого региона
     try:
-        for region in payload['regions']:
+        for region in state_payload['regions']:
             await SubscriptionQuery.add_subscription(
-                user_id=payload['user'],
+                user_id=invoice_payload.get("user"),
                 region_id=region,
                 payment_id=payment_id,
                 start_time=payment_time,
-                end_time=payment_time + relativedelta(months=1),  # ! add payed time period
+                end_time=payment_time.replace(month=12, day=31), #+ relativedelta(months=1),  # ! add payed time period
                 session=session
             )
         await SubscriptionQuery.commit(session)
@@ -607,8 +626,11 @@ async def cmd_start(msg: Message):
 async def show_users(msg: Message, session: AsyncSession):
     if msg.from_user.id in ADMIN_IDS:
         users = await UserQuery.get_all_users(session)
-        await msg.answer(f'Всего {len(users)} зарегистрированных пользователей: ' + "\n" +
-                         "\n⦁".join([f'{user.id} : {user.registration_time}' for user in users]))
+        await msg.answer(f'Всего {len(users)} зарегистрированных пользователей: ' + "\n👨🏻‍🦱" +
+                         "\n👨🏻‍🦱 ".join([f'{user.id} : {user.registration_time}' +
+                                     (f'\n     referrer: {user.referrer}' if user.referrer else '') +
+                                     ( '\n     contract: ☑' if user.accepted_contract else '')
+                                     for user in users]))
 
 
 @router.message(F.text == "💳 Оплаты")

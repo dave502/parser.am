@@ -375,7 +375,7 @@ async def clb_accept_contract(callback: CallbackQuery, state: FSMContext, sessio
 
     try:
         # if the user has accepted the contract put him in database
-        await UserQuery.create_user(callback.from_user.id, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), session)
+        await UserQuery.create_user(callback.from_user.id, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), session, accepted_contract=True)
     except Exception as e:
         logging.critical(f"An error occurred while creating a record with user in the database! {e}")
         await callback.answer()
