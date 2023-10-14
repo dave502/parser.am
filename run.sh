@@ -4,7 +4,7 @@
 python "./telegram/bot.py" &
 
 # run database migration
-(cd db; alembic upgrade head &)
+#(cd db; alembic upgrade head &)
 
 # # Start the second process
 ./cron/crawl.sh &
