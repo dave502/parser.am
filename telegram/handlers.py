@@ -503,7 +503,7 @@ async def cmd_choose_regions(msg: Message, session: AsyncSession):
     if user and user.accepted_contract:
         await get_active_regions(session)
         if len(active_regions):
-            await msg.answer(text=msgs.active_regions_title)
+            await msg.answer(text=msgs.select_regions_title)
             await msg.answer(text=msgs.check_regions, reply_markup=kb.create_list_of_regions_kb(active_regions))
         else:
             await msg.answer(text=msgs.no_active_regions_title)

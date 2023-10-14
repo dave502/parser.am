@@ -6,7 +6,7 @@ volumes:
 
 services:
   bot:
-    container_name: bot
+    container_name: reestr_parser_bot
     restart: always
     build: .
     command:
@@ -15,7 +15,34 @@ services:
       - |
         ./run.sh
     env_file:
-      - .env.vars
+      - .bot.env
     volumes:
       - reestrparser_bot_data:/bot/db/sqlite
       - reestrparser_bot_logs:/bot/logs
+
+  web:
+    build:
+       context: ./web
+       dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - reestrparser_bot_data:/app/sqlite
+    container_name: reestr_parser_web
+    command: >
+        sh -c "python web/manage.py migrate
+        && python web/manage.py runserver 0.0.0.0:8000
+        && source web/app/create_superuser.sh"
+    ports:
+      - "7000:8000"
+    env_file:
+      - .web.env
+    environment:
+      - DB_PATH=/app/sqlite
+    # depends_on:
+    #   - bot
+
+
+
+# sudo docker compose run web django-admin startproject <app> ./web/
+# docker compose run web python web/manage.py makemigrations
+# docker compose run web python web/manage.py migrate
