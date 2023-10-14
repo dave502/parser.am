@@ -1,4 +1,5 @@
-from django.contrib import admin
+from django.contrib import admin, messages
+from datetime import datetime
 
 from .models import *
 
@@ -108,4 +109,14 @@ class SubscriptonsAdmin(admin.ModelAdmin):
     "notice_sent", "notice_date", "scheduled", "notice_text"
     list_filter = [
         ("scheduled", admin.BooleanFieldListFilter),
+        ("user", admin.RelatedOnlyFieldListFilter),
     ]
+    actions = "renew_subscription",
+
+
+    @admin.action(description="Продлить подписку")
+    def renew_subscription(modeladmin, request, queryset):
+        for obj in queryset:
+            obj.end_time = datetime.now().date().replace(month=12, day=31)
+            obj.save()
+            messages.success(request, "Подписки продлены!")

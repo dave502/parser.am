@@ -14,7 +14,7 @@ COPY . $AppDir
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 RUN apt-get update && apt-get install -y cron \
-    && apt-get install -y --no-install-recommends ca-certificates curl firefox-esr \
+    && apt-get install -y --no-install-recommends  ca-certificates curl firefox-esr \
     && rm -fr /var/lib/apt/lists/*
 RUN touch $AppDir/logs/cron.log
 RUN chmod -R +x ./cron

@@ -598,7 +598,7 @@ async def process_successful_payment(msg: Message, session: AsyncSession, state:
                 region_id=region,
                 payment_id=payment_id,
                 start_time=payment_time,
-                end_time=payment_time.replace(month=12, day=31), #+ relativedelta(months=1),  # ! add payed time period
+                end_time=payment_time.replace(month=12, day=31)payment_time.replace(month=12, day=31), #+ relativedelta(months=1),  # ! add payed time period
                 session=session
             )
         await SubscriptionQuery.commit(session)
