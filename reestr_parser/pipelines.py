@@ -66,8 +66,8 @@ class ReestrParserPipeline:
 
         with self.Session() as session:
 
-            # если год web_документа меньше текущего года -> пропуск
-            if int(item['year']) < datetime.today().year:
+            # если год web_документа не равен текущему году -> пропуск
+            if int(item['year']) != datetime.today().year:
                 return item # ! None
 
             # document exists in database
