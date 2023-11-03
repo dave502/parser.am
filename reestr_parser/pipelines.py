@@ -125,7 +125,9 @@ class ReestrParserPipeline:
                     # set document's region as inactive
                     # RegionQuery.sync_set_region_active(item['region'], session, False)
                     # logger.debug(f"region {item['region']} was deactivated")
-                    ...
+
+                    if web_doc_status_code != db_doc_status_code:
+                        save_item_to_db = True
                 else:
                     # документ следует обновить в базе данных
                     save_item_to_db = True
