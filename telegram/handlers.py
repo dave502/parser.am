@@ -268,7 +268,10 @@ async def clb_make_payment(callback: CallbackQuery, callback_data: kb.CheckedCal
     selected_regions_names_list = ', '.join([active_regions[reg] for reg in selected_regions])
 
     # if testing payment
-    if payment_token.split(':')[1] == 'TEST':
+    # if payment_token.split(':')[1] == 'TEST':
+
+    # if real payment
+    if payment_token.split(':')[1] == 'LIVE':
         try:
             # await callback.message.answer('pre_buy_demo_alert')
             await callback.message.answer_invoice(title=msgs.payment_title,
