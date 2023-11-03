@@ -686,7 +686,7 @@ async def delete_user(msg: Message, session: AsyncSession):
 @router.message(F.text == "▶️ Start cron")
 async def show_users(msg: Message, session: AsyncSession):
     if msg.from_user.id in ADMIN_IDS:
-        os.system("/usr/local/bin/python/bot/reestr_parser/crawl.py")
+        os.system("/usr/local/bin/python /bot/reestr_parser/crawl.py")
 
 
 @router.message(F.text == "⏲ Лог cron")
