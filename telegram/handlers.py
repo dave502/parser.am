@@ -277,7 +277,7 @@ async def clb_make_payment(callback: CallbackQuery, callback_data: kb.CheckedCal
                                                 currency=msgs.currency,
                                                 is_flexible=False,  # True если конечная цена зависит от способа доставки
                                                 prices=[total],
-                                                start_parameter='time-machine-example',
+                                                start_parameter='start',
                                                 payload=json.dumps(payload_dict),
                                                 need_email=True,
                                                 send_email_to_provider=True,
@@ -434,7 +434,6 @@ async def cmd_start(msg: Message, state: FSMContext, session: AsyncSession):
                                            session,  referrer=referrer)
         except Exception as e:
             logging.critical(f"An error occurred while creating a record with user in the database! {e}")
-            await callback.answer()
             return
 
     await msg.answer(msgs.greetings.format(name=msg.from_user.full_name), reply_markup=kb.user_menu())
