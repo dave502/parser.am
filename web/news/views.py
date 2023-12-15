@@ -15,6 +15,6 @@ mongo_collection = db['news_spider']
 # Create your views here.
 def index(request):
     template = loader.get_template("news/index.html")
-    news = mongo_collection.find({})
+    news = mongo_collection.find({}).sort({created: -1}).limit(5)
     context = {"news": news}
     return render(request, "news/index.html", context)

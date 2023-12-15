@@ -13,6 +13,7 @@ import os
 from scrapy.exceptions import NotConfigured
 from itemadapter import ItemAdapter
 from dotenv import dotenv_values #load_dotenv
+from datetime import datetime
 import re
 
 class NewsPipeline:
@@ -62,6 +63,8 @@ class NewsPipeline:
             elif item['img'].startswith('https://www.youtube.com/embed/'):
                 video_id = re.findall('https://www.youtube.com/embed/(.*)\?.*', item['img'])[0]
                 item['img'] = f'https://img.youtube.com/vi/{video_id}/maxresdefault.jpg'
+                
+            doc['created'] = datetime.now()
             
             doc = collection.insert_one(item)
                 
