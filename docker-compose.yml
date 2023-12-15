@@ -1,46 +1,13 @@
 version: '3.9'
 
 services:
-  mongodb:
-    image: mongodb/mongodb-community-server:4.4-ubi8
-    container_name: parser_mongodb
-    hostname: $MONGO_HOST
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: $MONGO_ROOT_USERNAME
-      MONGO_INITDB_ROOT_PASSWORD: $MONGO_ROOT_PASSWORD
-    ports:
-      - 27017:27017
-    volumes:
-      - mongo_data:/data/db
-    networks:
-      - parser
-      
-  parser:
-    build:
-       context: ./parser
-       dockerfile: Dockerfile
-    container_name: parser_spider
-    environment:
-      MONGO_ROOT_USERNAME: $MONGO_ROOT_USERNAME
-      MONGO_ROOT_PASSWORD: MONGO_ROOT_PASSWORD
-    command:
-      - /bin/sh
-      - -c
-      - |
-        ./run.sh
-    volumes:
-      # - mongo_data:/data/db
-      - parser_logs:/app/logs
-    networks:
-      - parser
-    
+ 
   web:
     build:
        context: ./web
        dockerfile: Dockerfile
     volumes:
       - .:/app
-      # - reestrparser_bot_data:/app/sqlite
     container_name: parser_web
     command: >
         sh -c "python web/manage.py migrate
@@ -57,7 +24,6 @@ services:
 
 
 volumes:
-  mongo_data:
   parser_logs:
 
 networks:

@@ -1,1 +1,0 @@
-*/5 * * * * /usr/local/bin/python /app/news/crawl.py > /dev/null 2>&1

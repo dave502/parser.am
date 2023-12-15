@@ -24,7 +24,7 @@ MONGO_HOST = os.environ.get('MONGO_HOST', 'localhost:27017')
 MONGO_DB = os.environ.get('MONGO_DB', env.get('MONGO_DB'))
 
 if not all([MONGO_USER, MONGO_PASS, MONGO_HOST, MONGO_DB]):
-    raise Exception("Failed to get Mongodb credentials!")
+    raise Exception("Failed to get Mongodb credentials settigs!")
     
 MONGO_URL = f'mongodb://{MONGO_USER}:{MONGO_PASS}@{MONGO_HOST}?retryWrites=true&w=majority'
 
@@ -97,7 +97,7 @@ DATABASES = {
 # DATABASES = {
 #        'default': {
 #            'ENGINE': 'djongo',
-#            'NAME': MONGO_DB,
+#            'NAME': "db_mongo",
 #            'ENFORCE_SCHEMA': False,
 #             'CLIENT': {
 #                 'host': MONGO_URL
