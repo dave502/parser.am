@@ -6,12 +6,6 @@ import time
 import os
 from datetime import datetime
 
-TG_LOGGER_NAME = "tg_logger"
-REGION_CHANGES = "region_changes"
-PROCEDURES_LOGGER_NAME = "procedures"
-ALL_REGIONS_CSV = "all_regions"
-
-
 class CSVFormatter(logging.Formatter):
     def __init__(self):
         super().__init__()

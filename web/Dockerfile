@@ -1,9 +1,11 @@
 FROM python:3.12-alpine as base
-RUN apk add --update --virtual .build-deps \
-    build-base \
-    postgresql-dev \
-    python3-dev \
-    libpq
+
+RUN apk add --no-cache snappy-dev g++
+# RUN apk add --update --virtual .build-deps \
+#     build-base \
+#     postgresql-dev \
+#     python3-dev \
+#     libpq
 
 COPY requirements.txt /app/requirements.txt
 RUN pip install -r /app/requirements.txt

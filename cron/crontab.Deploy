@@ -1,2 +1,0 @@
-PYTHONPATH=/bot
-* 13 * * * python /bot/reestr_parser/crawl.py > /dev/null 2>&1

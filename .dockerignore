@@ -4,6 +4,6 @@ __pycache__
 .mypy_cache
 .pytest_cache
 .git
-env
-venv
-web/
+*.env
+env/
+venv/

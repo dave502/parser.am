@@ -1,33 +1,47 @@
 version: '3.9'
 
-volumes:
-  reestrparser_bot_data:
-  reestrparser_bot_logs:
-
 services:
-  bot:
-    container_name: reestr_parser_bot
-    restart: always
-    build: .
+  mongodb:
+    image: mongodb/mongodb-community-server:4.4-ubi8
+    container_name: parser_mongodb
+    hostname: $MONGO_HOST
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: $MONGO_ROOT_USERNAME
+      MONGO_INITDB_ROOT_PASSWORD: $MONGO_ROOT_PASSWORD
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - parser
+      
+  parser:
+    build:
+       context: ./parser
+       dockerfile: Dockerfile
+    container_name: parser_spider
+    environment:
+      MONGO_ROOT_USERNAME: $MONGO_ROOT_USERNAME
+      MONGO_ROOT_PASSWORD: MONGO_ROOT_PASSWORD
     command:
       - /bin/sh
       - -c
       - |
         ./run.sh
-    env_file:
-      - .bot.env
     volumes:
-      - reestrparser_bot_data:/bot/db/sqlite
-      - reestrparser_bot_logs:/bot/logs
-
+      # - mongo_data:/data/db
+      - parser_logs:/app/logs
+    networks:
+      - parser
+    
   web:
     build:
        context: ./web
        dockerfile: Dockerfile
     volumes:
       - .:/app
-      - reestrparser_bot_data:/app/sqlite
-    container_name: reestr_parser_web
+      # - reestrparser_bot_data:/app/sqlite
+    container_name: parser_web
     command: >
         sh -c "python web/manage.py migrate
         && python web/manage.py runserver 0.0.0.0:8000
@@ -35,14 +49,16 @@ services:
     ports:
       - "7000:8000"
     env_file:
-      - .web.env
+      - .env
     environment:
       - DB_PATH=/app/sqlite
-    # depends_on:
-    #   - bot
+    networks:
+      - parser
 
 
+volumes:
+  mongo_data:
+  parser_logs:
 
-# sudo docker compose run web django-admin startproject <app> ./web/
-# docker compose run web python web/manage.py makemigrations
-# docker compose run web python web/manage.py migrate
+networks:
+  parser:

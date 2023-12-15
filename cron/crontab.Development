@@ -1,2 +1,0 @@
-PYTHONPATH=/bot
-0 10 * * * /usr/local/bin/python /bot/reestr_parser/crawl.py >> /bot/logs/cron.log 2>&1

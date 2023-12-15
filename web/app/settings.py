@@ -11,10 +11,22 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
 from pathlib import Path
+import mongoengine
+from dotenv import dotenv_values
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-DB_PATH = Path(os.environ['DB_PATH'])
+
+env = dotenv_values('../.env')     
+MONGO_USER = os.environ.get('MONGO_ROOT_USERNAME', env.get('MONGO_ROOT_USERNAME'))
+MONGO_PASS = os.environ.get('MONGO_ROOT_PASSWORD', env.get('MONGO_ROOT_PASSWORD'))
+MONGO_HOST = os.environ.get('MONGO_HOST', 'localhost:27017')
+MONGO_DB = os.environ.get('MONGO_DB', env.get('MONGO_DB'))
+
+if not all([MONGO_USER, MONGO_PASS, MONGO_HOST, MONGO_DB]):
+    raise Exception("Failed to get Mongodb credentials!")
+    
+MONGO_URL = f'mongodb://{MONGO_USER}:{MONGO_PASS}@{MONGO_HOST}?retryWrites=true&w=majority'
 
 
 # Quick-start development settings - unsuitable for production
@@ -26,7 +38,7 @@ SECRET_KEY = 'django-insecure-wi4wb&rfh_^$(a8lh7+meexwsyo=%k13q-3tn3*!y--an5#yqd
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["92.53.127.29", "localhost"]
+ALLOWED_HOSTS = ["92.53.127.29", "localhost", '127.0.0.1']
 
 
 # Application definition
@@ -38,7 +50,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'reestr.apps.ReestrConfig',
+    'rest_framework',
+    'api.apps.ApiConfig',
+    'news.apps.NewsConfig',
+    
+    
 ]
 
 MIDDLEWARE = [
@@ -70,17 +86,24 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'app.wsgi.application'
-
-
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': DB_PATH / 'sqlite.db',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+# DATABASES = {
+#        'default': {
+#            'ENGINE': 'djongo',
+#            'NAME': MONGO_DB,
+#            'ENFORCE_SCHEMA': False,
+#             'CLIENT': {
+#                 'host': MONGO_URL
+#             }  
+#        }
+#    }
 
 
 # Password validation
