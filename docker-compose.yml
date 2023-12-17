@@ -26,6 +26,7 @@ services:
     build:
        context: ./img_processor
        dockerfile: Dockerfile
+       progress: plain
     container_name: img_processor
     ports:
       - 8500:8500
