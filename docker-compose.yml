@@ -22,7 +22,7 @@ services:
     networks:
       - parser
       
-  tfserving:
+  img_proc:
     build:
        context: ./img_processor
        dockerfile: Dockerfile
