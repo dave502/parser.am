@@ -7,7 +7,7 @@ FROM tensorflow/serving
 RUN apt-get update \
     && apt-get install --no-install-recommends -y curl  
 
-RUN mkdir -p $MODEL_PATH \
+RUN echo $MODEL_PATH && mkdir -p $MODEL_PATH \
     && curl -s $SAVED_MODEL_PATH | tar --strip-components=2 -C $MODEL_PATH -xvz
 
 EXPOSE 8501
