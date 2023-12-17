@@ -14,14 +14,26 @@ services:
         && python web/manage.py runserver 0.0.0.0:8000
         && source web/app/create_superuser.sh"
     ports:
-      - "7000:8000"
+      - 7000:8000
     env_file:
       - .env
     environment:
       - DB_PATH=/app/sqlite
     networks:
       - parser
-
+      
+  tfserving:
+    build:
+       context: ./img_processor
+       dockerfile: Dockerfile
+    container_name: img_processor
+    ports:
+      - 8501:8501
+    volumes:
+      - ./model:/models/model
+    environment:
+      - TENSORFLOW_SERVING_MODEL_NAME=model
+    entrypoint: [ "bash", "-c", "tensorflow_model_server --rest_api_port=8501 --model_name=model --model_base_path=/models/model/"]
 
 volumes:
   parser_logs:
