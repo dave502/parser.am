@@ -1,6 +1,6 @@
 FROM tensorflow/serving
 
-# ENV MODEL_PATH=/models/resnet
+ENV MODEL_PATH=/models/resnet
 # ENV MODEL_NAME=resnet
 # SAVED_MODEL_PATH
 
