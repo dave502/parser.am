@@ -20,10 +20,9 @@ app = FastAPI()
 def read_root():
     return "Faces detection app"
 
-@app.get("/detect_faces/{img_url}")
+@app.get("/detect_faces/{img_url:path}")
 def predict_sepsis_endpoint(img_url: str):
     
-    print(img_path)
     url = urlparse(img_url)
     filename = url.path.replace("/", "-")
     filepath = Path("images_temp") / filename

@@ -1,11 +1,13 @@
 import requests
+from urllib.parse import quote
 
 SERVER_URL = 'http://213.171.14.158:8080/detect_faces/' # 'http://localhost:8501/v1/models/resnet:predict'
-IMAGE_URL = 'http://image-cdn.hypb.st/https%3A%2F%2Fhypebeast.com%2Fimage%2F2017%2F05%2Fplaces-plus-faces-merch-01.jpg'
+IMAGE_URL = 'http://hypebeast.com/image/2017/05/places-plus-faces-merch-01.jpg?cbr=1&q=90'
 
 def main():
   # Download the image
-  dl_request = requests.get(SERVER_URL + '/' + IMAGE_URL, stream=True)
+  
+  dl_request = requests.get(SERVER_URL + quote(IMAGE_URL, safe=''), stream=True)
   dl_request.raise_for_status()
 
   if MODEL_ACCEPT_JPG:
