@@ -68,7 +68,9 @@ def detect_faces(img_url: str):
       cv2.rectangle(image, (x, y), (x+width, y+height), (255, 0, 0), 2)
       
     new_file_path = str(Path("./images_new") / filename)
-    cv2.imwrite(new_file_path, image)
+    print(f"{new_file_path=}")
+    result = cv2.imwrite(new_file_path, image)
+    print(f"{result=}")
       
     return {'img_url':"http://213.171.14.158/" + new_file_path}
     
