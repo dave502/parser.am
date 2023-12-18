@@ -25,13 +25,15 @@ def read_root():
 @app.get("/detect_faces/{img_url:path}")
 def detect_faces(img_url: str):
     
+    print(0)
+    
     url = urlparse(img_url)
     filename = url.path.replace("/", "-").strip('-')
     filepath = Path("./images_temp") / filename
     
     print(filepath)
     
-    dl_request = requests.get(img_url, stream=True)
+    dl_request = requests.get(img_url)
     dl_request.raise_for_status()
     print(1)
     with open(filepath, 'wb') as img_file:
