@@ -21,13 +21,16 @@ def read_root():
     return "Faces detection app"
 
 @app.get("/detect_faces/{img_url:path}")
-def predict_sepsis_endpoint(img_url: str):
+def detect_faces(img_url: str):
     
     url = urlparse(img_url)
     filename = url.path.replace("/", "-")
     filepath = Path("images_temp") / filename
     
+    print(filepath)
+    
     dl_request = requests.get(img_url, stream=True)
+    print(dl_request)
     dl_request.raise_for_status()
     img = tf.image.decode_jpeg(dl_request.content, channels=3)
     tf.keras.utils.save_img(filename, img)
