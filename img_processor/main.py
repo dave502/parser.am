@@ -21,10 +21,19 @@ def read_root():
     return "Faces detection app"
 
 @app.get("/detect_faces")
-def predict_sepsis_endpoint(img_path: str) -> str:
+def predict_sepsis_endpoint(img_url: str) -> str:
     
     print(img_path)
-    original_img = cv2.imread(img_path)
+    url = urlparse(img_url)
+    filename = url.path.replace("/", "-")
+    filepath = Path("images_temp") / filename
+    
+    dl_request = requests.get(img_url, stream=True)
+    dl_request.raise_for_status()
+    img = tf.image.decode_jpeg(dl_request.content, channels=3)
+    tf.keras.utils.save_img(filename, img)
+    
+    image = cv2.imread(filename)
     detector = MTCNN() 
     faces = detector.detect_faces(image)
     
@@ -34,10 +43,10 @@ def predict_sepsis_endpoint(img_path: str) -> str:
       
       
     url = urlparse(img_path)
-    filename = Path("images") / url.path.replace("/", "-")
-    cv2.imwrite(filename, image)
+    new_file_path = Path("images_new") / filename
+    cv2.imwrite(new_file_path, image)
       
-    return ("http://213.171.14.158" + filename)
+    return ("http://213.171.14.158/" + new_file_path)
     
     
     
