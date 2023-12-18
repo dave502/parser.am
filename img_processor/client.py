@@ -2,7 +2,7 @@ import requests
 from urllib.parse import quote
 
 SERVER_URL = 'http://213.171.14.158:8080/detect_faces/' # 'http://localhost:8501/v1/models/resnet:predict'
-IMAGE_URL = 'http://hypebeast.com/image/2017/05/places-plus-faces-merch-01.jpg?cbr=1&q=90'
+IMAGE_URL = 'https://www.urlencoder.io/static/79f22f13dec2866b2903a6c89f31a9b4/72e01/how-to-do-url-encoding-in-java.jpg'
 
 def main():
   # Download the image

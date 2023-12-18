@@ -32,14 +32,20 @@ def detect_faces(img_url: str):
     print(filepath)
     
     dl_request = requests.get(img_url, stream=True)
-    print(dl_request)
+    print(1)
     dl_request.raise_for_status()
+    print(2)
     img = tf.image.decode_jpeg(dl_request.content, channels=3)
+    print(3)
     tf.keras.utils.save_img(filename, img)
+    print(4)
     
     image = cv2.imread(filename)
+    print(5)
     detector = MTCNN() 
+    print(6)
     faces = detector.detect_faces(image)
+    print(7)
     
     for face in faces:
       x, y, width, height = face['box']
