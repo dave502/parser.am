@@ -125,7 +125,9 @@ def detect_faces(img_url: str):
       x, y, width, height = face['box']
       cv2.rectangle(image, (x, y), (x+width, y+height), (255, 0, 0), 2)
       
-    return Response(content=image, media_type="image/png")
+    success, img_numpy = cv2.imencode('.jpg', image)
+    img_bytes = img_numpy.tostring()
+    return Response(content=img_bytes, media_type="image/png")
       
  
 
