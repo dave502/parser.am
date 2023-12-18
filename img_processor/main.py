@@ -33,12 +33,14 @@ def detect_faces(img_url: str):
     
     dl_request = requests.get(img_url, stream=True)
     print(1)
-    dl_request.raise_for_status()
-    print(2)
-    img = tf.image.decode_jpeg(dl_request.content, channels=3)
-    print(3)
-    tf.keras.utils.save_img(filename, img)
-    print(4)
+    with open(filepath, 'wb') as img_file:
+      img_file.write(dl_request.content)
+    # dl_request.raise_for_status()
+    # print(2)
+    # img = tf.image.decode_jpeg(dl_request.content, channels=3)
+    # print(3)
+    # tf.keras.utils.save_img(filename, img)
+    # print(4)
     
     image = cv2.imread(filename)
     print(5)
