@@ -30,7 +30,7 @@ services:
     ports:
       # - 8500:8500
       # - 8501:8501
-      - 8000:8000
+      - 8080:8080
     # volumes:
     #   - ./img_processor/models:/models
     # environment:
