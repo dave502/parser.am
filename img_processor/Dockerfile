@@ -1,16 +1,20 @@
-FROM tensorflow/serving
+# Use the official Python base image
+FROM python:3.12-slim
 
-# ENV MODEL_PATH=/models/resnet
-# ENV MODEL_NAME=resnet
-# ENV SAVED_MODEL_PATH="https://storage.googleapis.com/download.tensorflow.org/models/official/20181001_resnet/savedmodels/resnet_v2_fp32_savedmodel_NHWC_jpg.tar.gz"
+# Set the working directory inside the container
+WORKDIR /app
 
-# RUN apt-get update \
-#     && apt-get install --no-install-recommends -y curl
+# Copy the requirements file to the working directory
+COPY requirements.txt .
 
-# RUN echo ${MODEL_PATH}/1/ && mkdir -p ${MODEL_PATH}/1/ \
-#     && curl -s $SAVED_MODEL_PATH | tar --strip-components=2 -C ${MODEL_PATH}/1/ -xvz
+# Install the Python dependencies
+RUN pip install -r requirements.txt
 
-EXPOSE 8501
-EXPOSE 8500
+# Copy the application code to the working directory
+COPY . .
 
-# RUN tensorflow_model_server --rest_api_port=8501 --model_name=$MODEL_NAME --model_base_path=$MODEL_PATH
+# Expose the port on which the application will run
+EXPOSE 8080
+
+# Run the FastAPI application using uvicorn server
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]

@@ -1,60 +1,43 @@
 
-import tensorflow as tf
-import tensorflow_hub as hub
-# import matplotlib.pyplot as plt
-
-# # For drawing onto the image.
-import numpy as np
-from PIL import Image, ImageColor, ImageDraw, ImageFont, ImageFile
-
+from mtcnn import MTCNN 
+import tensorflow as tf 
+import cv2
 
 # # For measuring the inference time.
 import time
 
-
-
-
 # import pandas as pd
-# import joblib
+from urllib.parse import urlparse
 from fastapi import FastAPI
 import uvicorn
 import numpy as np
 import os
 
+
 app = FastAPI()
-
-# def load_model():
-#     cwd = os.getcwd()
-#     destination = os.path.join(cwd, "Assets")
-
-#     imputer_filepath = os.path.join(destination, "numerical_imputer.joblib")
-#     scaler_filepath = os.path.join(destination, "scaler.joblib")
-#     model_filepath = os.path.join(destination, "lr_model.joblib")
-
-#     num_imputer = joblib.load(imputer_filepath)
-#     scaler = joblib.load(scaler_filepath)
-#     model = joblib.load(model_filepath)
-
-#     return num_imputer, scaler, model
-
-
-# def preprocess_input_data(input_data, num_imputer, scaler):
-#     input_data_df = pd.DataFrame([input_data])
-#     num_columns = [col for col in input_data_df.columns if input_data_df[col].dtype != 'object']
-#     input_data_imputed_num = num_imputer.transform(input_data_df[num_columns])
-#     input_scaled_df = pd.DataFrame(scaler.transform(input_data_imputed_num), columns=num_columns)
-#     return input_scaled_df
 
 @app.get("/")
 def read_root():
     return "Faces detection app"
 
-
 @app.get("/detect_faces")
 def predict_sepsis_endpoint(img_path: str) -> str:
     
-    original_img = load_img(img_path)
-    return ("res")
+    print(img_path)
+    original_img = cv2.imread(img_path)
+    detector = MTCNN() 
+    faces = detector.detect_faces(image)
+    
+    for face in faces:
+      x, y, width, height = face['box']
+      cv2.rectangle(image, (x, y), (x+width, y+height), (255, 0, 0), 2)
+      
+      
+    url = urlparse(img_path)
+    filename = Path("images") / url.path.replace("/", "-")
+    cv2.imwrite(filename, image)
+      
+    return ("http://213.171.14.158" + filename)
     
     
     

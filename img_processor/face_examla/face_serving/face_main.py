@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 from scipy import misc
 
-import face.serving.face_detect as face
+import serving.face_detect as face
 
 logging.basicConfig(level=logging.DEBUG)
 
