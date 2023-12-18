@@ -13,6 +13,7 @@ import uvicorn
 import numpy as np
 import os
 from pathlib import Path
+import requests
 
 
 app = FastAPI()
