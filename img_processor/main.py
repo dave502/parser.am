@@ -47,7 +47,7 @@ def detect_faces(img_url: str):
     with open(filepath, 'wb') as img_file:
       img_file.write(dl_request.content)
       
-    print(f"{filepath.is_file()=}")
+    print(f"{filepath=} {filepath.is_file()=}")
     # dl_request.raise_for_status()
     # print(2)
     # img = tf.image.decode_jpeg(dl_request.content, channels=3)
@@ -55,7 +55,8 @@ def detect_faces(img_url: str):
     # tf.keras.utils.save_img(filename, img)
     # print(4)
     
-    image = cv2.imread(filepath)
+    print(f"{str(filepath)=}")
+    image = cv2.imread(str(filepath))
     print(f"{len(image)=}")
     detector = MTCNN() 
     print(6)

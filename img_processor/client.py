@@ -9,19 +9,19 @@ IMAGE_URL = 'https://www.urlencoder.io/static/79f22f13dec2866b2903a6c89f31a9b4/7
 def main():
   # Download the image
   
-  img_url = quote(IMAGE_URL, safe='')
-  url = urlparse(img_url)
-  filename = url.path.replace("/", "-").strip('-')
-  filepath = Path("./images_temp") / filename
+  # img_url = quote(IMAGE_URL, safe='')
+  # url = urlparse(img_url)
+  # filename = url.path.replace("/", "-").strip('-')
+  # filepath = Path("./images_temp") / filename
   
-  print(filepath)
+  # print(filepath)
   
-  img_url = unquote(img_url)
-  dl_request = requests.get(img_url)
-  dl_request.raise_for_status()
-  print(1)
-  with open(filepath, 'wb') as img_file:
-    img_file.write(dl_request.content)
+  # img_url = unquote(img_url)
+  # dl_request = requests.get(img_url)
+  # dl_request.raise_for_status()
+  # print(1)
+  # with open(filepath, 'wb') as img_file:
+  #   img_file.write(dl_request.content)
   
   dl_request = requests.get(SERVER_URL + quote(IMAGE_URL, safe=''), stream=True)
   dl_request.raise_for_status()
