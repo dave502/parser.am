@@ -20,8 +20,8 @@ app = FastAPI()
 def read_root():
     return "Faces detection app"
 
-@app.get("/detect_faces")
-def predict_sepsis_endpoint(img_url: str) -> str:
+@app.get("/detect_faces/{img_url}")
+def predict_sepsis_endpoint(img_url: str):
     
     print(img_path)
     url = urlparse(img_url)
@@ -46,7 +46,7 @@ def predict_sepsis_endpoint(img_url: str) -> str:
     new_file_path = Path("images_new") / filename
     cv2.imwrite(new_file_path, image)
       
-    return ("http://213.171.14.158/" + new_file_path)
+    return {'img_url':"http://213.171.14.158/" + new_file_path}
     
     
     
