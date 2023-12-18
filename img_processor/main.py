@@ -27,7 +27,7 @@ def detect_faces(img_url: str):
     
     url = urlparse(img_url)
     filename = url.path.replace("/", "-")
-    filepath = Path("images_temp") / filename
+    filepath = Path("./images_temp") / filename
     
     print(filepath)
     
@@ -55,7 +55,7 @@ def detect_faces(img_url: str):
       
       
     url = urlparse(img_path)
-    new_file_path = Path("images_new") / filename
+    new_file_path = Path("./images_new") / filename
     cv2.imwrite(new_file_path, image)
       
     return {'img_url':"http://213.171.14.158/" + new_file_path}
