@@ -25,19 +25,26 @@ def read_root():
 @app.get("/detect_faces/{img_url:path}")
 def detect_faces(img_url: str):
     
-    print(0)
     img_url = unquote(img_url)
+    TEMP_FOLDER = Path("./images_temp")
+    
+    print(f"{img_url=}")
+    
     url = urlparse(img_url)
     filename = url.path.replace("/", "-").strip('-')
-    filepath = Path("./images_temp") / filename
+    filepath = TEMP_FOLDER / filename
     
-    print(filepath)
-    
+    print(f"{filepath=}")
+
     dl_request = requests.get(img_url)
     dl_request.raise_for_status()
-    print(1)
+    
+    print(f"{dl_request.status_code=}")
+     
     with open(filepath, 'wb') as img_file:
       img_file.write(dl_request.content)
+      
+    print(f"files {Path(TEMP_FOLDER).glob('**/*')}")
     # dl_request.raise_for_status()
     # print(2)
     # img = tf.image.decode_jpeg(dl_request.content, channels=3)
@@ -46,7 +53,7 @@ def detect_faces(img_url: str):
     # print(4)
     
     image = cv2.imread(filename)
-    print(5)
+    print(f"{len(image)=}")
     detector = MTCNN() 
     print(6)
     faces = detector.detect_faces(image)
