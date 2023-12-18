@@ -16,7 +16,7 @@ from pathlib import Path
 import requests
 import io
 from starlette.responses import StreamingResponse
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 
 
 app = FastAPI()
