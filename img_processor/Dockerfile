@@ -11,5 +11,6 @@ FROM tensorflow/serving
 #     && curl -s $SAVED_MODEL_PATH | tar --strip-components=2 -C ${MODEL_PATH}/1/ -xvz
 
 EXPOSE 8501
+EXPOSE 8500
 
 # RUN tensorflow_model_server --rest_api_port=8501 --model_name=$MODEL_NAME --model_base_path=$MODEL_PATH
