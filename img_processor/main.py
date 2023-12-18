@@ -32,6 +32,9 @@ def detect_faces(img_url: str):
     
     url = urlparse(img_url)
     filename = url.path.replace("/", "-").strip('-')
+    
+    print(f"{filename=}")
+    
     filepath = TEMP_FOLDER / filename
     
     print(f"{filepath=}")
@@ -44,7 +47,7 @@ def detect_faces(img_url: str):
     with open(filepath, 'wb') as img_file:
       img_file.write(dl_request.content)
       
-    print(f"files {Path(TEMP_FOLDER).glob('**/*')}")
+    print(f"{filepath.is_file()=}")
     # dl_request.raise_for_status()
     # print(2)
     # img = tf.image.decode_jpeg(dl_request.content, channels=3)
@@ -52,7 +55,7 @@ def detect_faces(img_url: str):
     # tf.keras.utils.save_img(filename, img)
     # print(4)
     
-    image = cv2.imread(filename)
+    image = cv2.imread(filepath)
     print(f"{len(image)=}")
     detector = MTCNN() 
     print(6)
