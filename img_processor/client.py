@@ -23,8 +23,9 @@ def main():
   # with open(filepath, 'wb') as img_file:
   #   img_file.write(dl_request.content)
   
-  dl_request = requests.get(SERVER_URL + quote(IMAGE_URL, safe=''), stream=True)
-  dl_request.raise_for_status()
+  respone = requests.get(SERVER_URL + quote(IMAGE_URL, safe=''), stream=True)
+  respone.raise_for_status()
+  new_img = respone.json().get('img_url')
 
   if MODEL_ACCEPT_JPG:
     # Compose a JSON Predict request (send JPEG image in base64).
