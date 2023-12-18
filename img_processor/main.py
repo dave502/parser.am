@@ -26,12 +26,13 @@ def read_root():
 def detect_faces(img_url: str):
     
     url = urlparse(img_url)
-    filename = url.path.replace("/", "-")
+    filename = url.path.replace("/", "-").strip('-')
     filepath = Path("./images_temp") / filename
     
     print(filepath)
     
     dl_request = requests.get(img_url, stream=True)
+    dl_request.raise_for_status()
     print(1)
     with open(filepath, 'wb') as img_file:
       img_file.write(dl_request.content)
