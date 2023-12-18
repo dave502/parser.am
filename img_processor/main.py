@@ -7,7 +7,7 @@ import cv2
 import time
 
 # import pandas as pd
-from urllib.parse import urlparse
+from urllib.parse import urlparse, unquote
 from fastapi import FastAPI
 import uvicorn
 import numpy as np
@@ -26,7 +26,7 @@ def read_root():
 def detect_faces(img_url: str):
     
     print(0)
-    
+    img_url = unquote(img_url)
     url = urlparse(img_url)
     filename = url.path.replace("/", "-").strip('-')
     filepath = Path("./images_temp") / filename

@@ -1,11 +1,27 @@
 import requests
-from urllib.parse import quote
+from urllib.parse import quote, unquote
+from urllib.parse import urlparse
+from pathlib import Path
 
 SERVER_URL = 'http://213.171.14.158:8080/detect_faces/' # 'http://localhost:8501/v1/models/resnet:predict'
 IMAGE_URL = 'https://www.urlencoder.io/static/79f22f13dec2866b2903a6c89f31a9b4/72e01/how-to-do-url-encoding-in-java.jpg'
 
 def main():
   # Download the image
+  
+  img_url = quote(IMAGE_URL, safe='')
+  url = urlparse(img_url)
+  filename = url.path.replace("/", "-").strip('-')
+  filepath = Path("./images_temp") / filename
+  
+  print(filepath)
+  
+  img_url = unquote(img_url)
+  dl_request = requests.get(img_url)
+  dl_request.raise_for_status()
+  print(1)
+  with open(filepath, 'wb') as img_file:
+    img_file.write(dl_request.content)
   
   dl_request = requests.get(SERVER_URL + quote(IMAGE_URL, safe=''), stream=True)
   dl_request.raise_for_status()
