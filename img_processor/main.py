@@ -18,7 +18,6 @@ import io
 from starlette.responses import StreamingResponse
 from fastapi.responses import FileResponse, Response
 
-
 app = FastAPI()
 
 @app.get("/")
@@ -92,6 +91,7 @@ def get_pic_with_faces(img_url: str):
     """
     
     img_url = unquote(img_url)
+    print(f"{img_url=}")
     TEMP_FOLDER = Path("./images_temp")
     
     url = urlparse(img_url)

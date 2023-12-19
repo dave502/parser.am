@@ -15,7 +15,6 @@ import re
 async def index(request):
     
     START_URL = "https://news.am/eng/"
-    DETECT_FACES = True
     
     # xPath to top 5 news
     URL_TOP_NEWS_ARTICLE = "//div[@class='news-list short-top']/a[@class='news-item']/@href"
@@ -59,6 +58,8 @@ async def index(request):
 
 
 async def parse_item(url: str, fields: dict[str:list[str]]) -> dict:
+
+    DETECT_FACES = True
 
     base_url = 'https://news.am'
     # some urls are wihout domain and some (from news branches) are with domain,
