@@ -4,7 +4,7 @@ from django.conf import settings
 from django.template import loader
 import pymongo
 
-from urllib.parse import urlparse
+from urllib.parse import urlparse, quote
 from lxml import html
 import requests
 import asyncio
