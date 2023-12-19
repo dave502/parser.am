@@ -18,12 +18,22 @@
                 {% for news_article in news %}
                     <div class="card mb-4" style="width: 80vh;">
                         
-                        <img style="background-image: url('{{ news_article.orig_img }}') " src="{{ news_article.img }}" class="card-img-top" alt="...">
+                        <img id="myimage" style="background-image: url('{{ news_article.orig_img }}') " src="{{ news_article.orig_img }}" class="card-img-top" alt="...">
                         <div class="card-body">
                         <h5 class="card-title">{{ news_article.title }}</h5>
                         <p class="card-text">{{ news_article.text }}</p>
                         <!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
                         </div>
+                            <script>
+                                $.ajax({ url: 'http://213.171.14.158:8080/img/{{ news_article.img }}',
+                                    type: 'GET',
+                                    success: function(response) {
+                                        $("#myimage").attr('src', response.content);
+                                    },
+                                    error: function(obj, status, err) { alert(err); console.log(err); }
+                                });
+                            </script>
+                        {% endwith %}
                     </div>   
                 {% endfor %}
                 </div>
