@@ -120,7 +120,7 @@ async def parse_item(url: str, fields: dict[str:list[str]]) -> dict:
             
         if DETECT_FACES:
             doc_values['orig_img'] = img_url   
-            doc_values["img"] = img_server + '/img/' + quote(img_url, safe='')
+            doc_values["img"] = img_server + 'img/' + quote(img_url, safe='')
         else:
             doc_values["img"] = img_url
 
