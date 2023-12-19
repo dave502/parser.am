@@ -29,6 +29,7 @@ services:
        context: ./img_processor
        dockerfile: Dockerfile
     container_name: img_processor
+    hostname: img
     ports:
       # - 8500:8500
       # - 8501:8501
