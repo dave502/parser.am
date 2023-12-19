@@ -9,6 +9,7 @@ from lxml import html
 import requests
 import asyncio
 import re
+import os
 
 
  
@@ -60,6 +61,7 @@ async def index(request):
 async def parse_item(url: str, fields: dict[str:list[str]]) -> dict:
 
     DETECT_FACES = True
+    img_server = os.getenv('IMG_SERVER') 
 
     base_url = 'https://news.am'
     # some urls are wihout domain and some (from news branches) are with domain,
@@ -113,7 +115,7 @@ async def parse_item(url: str, fields: dict[str:list[str]]) -> dict:
                     doc_values[key] = val
                     
                 if DETECT_FACES:
-                    doc_values[key] = 'http://host.docker.internal:8080/' + quote(doc_values[key], safe='')
+                    doc_values[key] = img_server + quote(doc_values[key], safe='')
                     
     
     return doc_values
