@@ -61,6 +61,7 @@ async def index(request):
 async def parse_item(url: str, fields: dict[str:list[str]]) -> dict:
 
     DETECT_FACES = True
+    SUMMARIZE_TEXT = True
     img_server = os.getenv('IMG_SERVER') 
 
     base_url = 'https://news.am'
@@ -80,43 +81,88 @@ async def parse_item(url: str, fields: dict[str:list[str]]) -> dict:
     # get from tree all fields with given tags
     doc_values = {field_key: ([tree.xpath(field_val) for field_val in fields if tree.xpath(field_val)]) 
         for (field_key, fields) in fields.items()}
-    
-    # process the fields
-    for key, val in doc_values.items():
-
-        if not (key and val):
-            continue
         
-        # the result fields are in the list with various level of nested, 
-        # so lets try to get all data just as string values
         
-        # for text field combine all elements inside the list
-        if key == "text":
-            while isinstance(val, list):
-                if isinstance(val[0], list):
-                    val = val[0]
+    if title := doc_values.get("title"):
+        while isinstance(title, list):
+            title = title[0]
+        doc_values["title"] = title.strip()     
+        
+        
+    if text := doc_values.get("text"):
+        while isinstance(text, list):
+            if isinstance(text[0], list):
+                text = text[0]
+            else:
+                if SUMMARIZE_TEXT:
+                    ...
                 else:
-                    val = " ".join(" ".join(val).split()[:50]) + "..."
-                    doc_values[key] = val
-        else:
-            # for title and pic just get the nested list and get the string from it
-            while isinstance(val, list):
-                val = val[0]
-            doc_values[key] = val.strip()
+                    text = " ".join(" ".join(text).split()[:50]) + "..."
+                doc_values["text"] = text   
+        
+    
+    
+    if img_url := doc_values.get("img"):
+        # for title and pic just get the nested list and get the string from it
+        while isinstance(img_url, list):
+            img_url = img_url[0]
+        img_url = img_url.strip()
+        
+        if not img_url.startswith('https:'):
+            img_url = base_url + '/' + img_url.lstrip('/')
             
-            # for image process url to working form
-            if key == "img":
-                if not val.startswith('https:'):
-                    val = base_url + '/' + val.lstrip('/')
-                    doc_values[key] = val
-                elif val.startswith('https://www.youtube.com/embed/'):
-                    video_id = re.findall('https://www.youtube.com/embed/(.*)\?.*', val)[0]
-                    val = f'https://img.youtube.com/vi/{video_id}/maxresdefault.jpg'
-                    doc_values[key] = val
+        elif img_url.startswith('https://www.youtube.com/embed/'):
+            video_id = re.findall('https://www.youtube.com/embed/(.*)\?.*', img_url)[0]
+            img_url = f'https://img.youtube.com/vi/{video_id}/maxresdefault.jpg'
+            
+        if DETECT_FACES:
+            doc_values['orig_img'] = img_url   
+            doc_values["img"] = img_server + '/img/' + quote(img_url, safe='')
+        else:
+            doc_values["img"] = img_url
+
+                
+                
+
+    
+    # # process the fields
+    # for key, val in doc_values.items():
+
+    #     if not (key and val):
+    #         continue
+        
+    #     # the result fields are in the list with various level of nested, 
+    #     # so lets try to get all data just as string values
+        
+    #     # for text field combine all elements inside the list
+    #     if key == "text":
+    #         while isinstance(val, list):
+    #             if isinstance(val[0], list):
+    #                 val = val[0]
+    #             else:
+    #                 val = " ".join(" ".join(val).split()[:50]) + "..."
+    #                 doc_values[key] = val
+    #     else:
+    #         # for title and pic just get the nested list and get the string from it
+    #         while isinstance(val, list):
+    #             val = val[0]
+    #         doc_values[key] = val.strip()
+            
+    #         # for image process url to working form
+    #         if key == "img":
+    #             if not val.startswith('https:'):
+    #                 val = base_url + '/' + val.lstrip('/')
+    #                 doc_values[key] = val
+    #             elif val.startswith('https://www.youtube.com/embed/'):
+    #                 video_id = re.findall('https://www.youtube.com/embed/(.*)\?.*', val)[0]
+    #                 val = f'https://img.youtube.com/vi/{video_id}/maxresdefault.jpg'
+    #                 doc_values[key] = val
                     
-                if DETECT_FACES:
-                    doc_values[key] = img_server + '/img/' + quote(doc_values[key], safe='')
-                    doc_values['orig_img'] = doc_values[key]
-                    
+    #             if DETECT_FACES:
+    #                 doc_values[key] = img_server + '/img/' + quote(doc_values[key], safe='')
+
+    
+    # if DETECT_FACES:
+    #     doc_values['orig_img'] = doc_values.get["img"]              
     
     return doc_values
