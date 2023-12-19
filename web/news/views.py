@@ -15,6 +15,9 @@ import os
  
 async def index(request):
     
+    img_detect = bool(int(request.GET.get("img", False)))
+    txt_summarize = bool(int(request.GET.get("txt", False)))
+    
     START_URL = "https://news.am/eng/"
     
     # xPath to top 5 news
@@ -47,7 +50,8 @@ async def index(request):
     # get top 5 news 
     top_news_urls = tree.xpath(URL_TOP_NEWS_ARTICLE)
     # create a list of tasks for parsing for every news article 
-    parsers = [parse_item(top_news_url, ARTICLE_FIELDS) for top_news_url in top_news_urls]
+    parsers = [parse_item(top_news_url, ARTICLE_FIELDS, img_detect, txt_summarize) \
+                for top_news_url in top_news_urls]
     # run tasks and get results when they are all will be ready
     news = await asyncio.gather(*parsers)
     
@@ -58,12 +62,13 @@ async def index(request):
     return render(request, "news/index.html", context)
 
 
-async def parse_item(url: str, fields: dict[str:list[str]]) -> dict:
+async def parse_item(url: str, 
+                    fields: dict[str:list[str]], 
+                    img_detect:bool=False, 
+                    txt_summarize:bool=False) -> dict:
 
-    DETECT_FACES = True
-    SUMMARIZE_TEXT = True
     img_server = os.getenv('IMG_SERVER', 'http://213.171.14.158:8080/') 
-    txt_server = os.getenv('TXT_SERVER', 'http://213.171.14.158:8080/') 
+    txt_server = os.getenv('TXT_SERVER', 'http://213.171.14.158:8070/') 
 
     base_url = 'https://news.am'
     # some urls are wihout domain and some (from news branches) are with domain,
@@ -98,7 +103,7 @@ async def parse_item(url: str, fields: dict[str:list[str]]) -> dict:
                 text = text[0]
             else:
                 print(f"{text=}")   
-                if SUMMARIZE_TEXT:
+                if txt_summarize:
                     resp = requests.get(txt_server, params={'text': text[0]})
                     text = resp.json().get('text')
                 else:
@@ -120,7 +125,7 @@ async def parse_item(url: str, fields: dict[str:list[str]]) -> dict:
             video_id = re.findall('https://www.youtube.com/embed/(.*)\?.*', img_url)[0]
             img_url = f'https://img.youtube.com/vi/{video_id}/maxresdefault.jpg'
             
-        if DETECT_FACES:
+        if img_detect:
             doc_values['orig_img'] = img_url   
             doc_values["img"] = img_server + 'img/' + quote(img_url, safe='')
         else:
