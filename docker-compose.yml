@@ -19,7 +19,7 @@ services:
       - .env
     environment:
       - DB_PATH=/app/sqlite
-      - IMG_SERVER=http://img_proc:8080/
+      - IMG_SERVER=http://213.171.14.158:8080/
 
     networks:
       - parser
