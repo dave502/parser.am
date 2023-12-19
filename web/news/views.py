@@ -15,6 +15,7 @@ import re
 async def index(request):
     
     START_URL = "https://news.am/eng/"
+    DETECT_FACES = True
     
     # xPath to top 5 news
     URL_TOP_NEWS_ARTICLE = "//div[@class='news-list short-top']/a[@class='news-item']/@href"
@@ -39,7 +40,7 @@ async def index(request):
             ],
         }
 
-    # get response fro, start page
+    # get response from start page
     resp = requests.get(START_URL)
     # get elements tree
     tree = html.fromstring(resp.content)
@@ -109,5 +110,9 @@ async def parse_item(url: str, fields: dict[str:list[str]]) -> dict:
                     video_id = re.findall('https://www.youtube.com/embed/(.*)\?.*', val)[0]
                     val = f'https://img.youtube.com/vi/{video_id}/maxresdefault.jpg'
                     doc_values[key] = val
+                    
+                if DETECT_FACES:
+                    doc_values[key] = 'img_proc/img/' + quote(doc_values[key], safe='')
+                    
     
     return doc_values

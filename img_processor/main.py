@@ -25,101 +25,91 @@ app = FastAPI()
 def read_root():
     return "Faces detection app"
 
-@app.get("/url_with_faces/{img_url:path}")
-def detect_faces(img_url: str):
-    
+@app.get("/img_url/{img_url:path}")
+def make_pic_with_faces(img_url: str):
+    """
+     1. gets picture from web with url == img_url
+     2. detects faces on the picture 
+     3. saves the picture with detected faces on server 
+     4. returns the url of picture fith faces 
+     
+     img_url - url of picture in web
+    """
+      
     img_url = unquote(img_url)
     TEMP_FOLDER = Path("./images_temp")
-    
-    print(f"{img_url=}")
     
     url = urlparse(img_url)
     filename = url.path.replace("/", "-").strip('-')
     
-    print(f"{filename=}")
-    
     filepath = TEMP_FOLDER / filename
-    
-    print(f"{filepath=}")
 
     dl_request = requests.get(img_url)
     dl_request.raise_for_status()
-    
-    print(f"{dl_request.status_code=}")
-     
+       
     with open(filepath, 'wb') as img_file:
       img_file.write(dl_request.content)
-      
-    print(f"{filepath=} {filepath.is_file()=}")
-    # dl_request.raise_for_status()
-    # print(2)
-    # img = tf.image.decode_jpeg(dl_request.content, channels=3)
-    # print(3)
-    # tf.keras.utils.save_img(filename, img)
-    # print(4)
-    
-    print(f"{str(filepath)=}")
+
     image = cv2.imread(str(filepath))
-    print(f"{len(image)=}")
+
     detector = MTCNN() 
-    print(6)
+
     faces = detector.detect_faces(image)
-    print(7)
     
     for face in faces:
       x, y, width, height = face['box']
       cv2.rectangle(image, (x, y), (x+width, y+height), (255, 0, 0), 2)
       
     new_file_path = str(Path("./images_new") / filename)
-    print(f"{new_file_path=}")
+
     result = cv2.imwrite(new_file_path, image)
-    print(f"{result=}")
       
     return {'img_url':"http://213.171.14.158/img/" + new_file_path}
     
     
-@app.get("/img/{img_url:path}")
-def detect_faces(img_url: str):
+@app.get("/img_get/{img_url:path}")
+def get_pic_with_faces(img_url: str):
+  
+    """
+    gets picture with faces from server with url == img_url
+     
+    img_url - url of picture on server (returned by /img_url/)
+    """
     
     FOLDER = Path("./images_new")
     return FileResponse(FOLDER / img_url)
     
     
-@app.get("/img_with_faces/{img_url:path}")
-def detect_faces(img_url: str):
+@app.get("/img/{img_url:path}")
+def get_pic_with_faces(img_url: str):
+  
+    """
+     1. gets picture from web with url == img_url
+     2. detects faces on the picture 
+     3. returns the picture as bytes response
+     
+     img_url - url of picture in web
+    """
     
     img_url = unquote(img_url)
     TEMP_FOLDER = Path("./images_temp")
     
-    print(f"{img_url=}")
-    
     url = urlparse(img_url)
     filename = url.path.replace("/", "-").strip('-')
     
-    print(f"{filename=}")
-    
     filepath = TEMP_FOLDER / filename
-    
-    print(f"{filepath=}")
 
     dl_request = requests.get(img_url)
     dl_request.raise_for_status()
-    
-    print(f"{dl_request.status_code=}")
      
     with open(filepath, 'wb') as img_file:
       img_file.write(dl_request.content)
-      
-    print(f"{filepath=} {filepath.is_file()=}")
 
-    
-    print(f"{str(filepath)=}")
     image = cv2.imread(str(filepath))
-    print(f"{len(image)=}")
+
     detector = MTCNN() 
-    print(6)
+
     faces = detector.detect_faces(image)
-    print(7)
     
     for face in faces:
       x, y, width, height = face['box']
@@ -130,8 +120,6 @@ def detect_faces(img_url: str):
     return Response(content=img_bytes, media_type="image/png")
       
  
-
-
 if __name__ == "__main__":
     print("test")
     uvicorn.run(app, host="0.0.0.0", port=8080, reload=True)
