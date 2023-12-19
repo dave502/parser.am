@@ -98,10 +98,10 @@ async def parse_item(url: str, fields: dict[str:list[str]]) -> dict:
             else:
                 print(f"{text=}")   
                 if SUMMARIZE_TEXT:
-                    ...
+                    text = text[0]
                 else:
                     text = " ".join(" ".join(text).split()[:50]) + "..."
-                doc_values["text"] = text   
+        doc_values["text"] = text   
         
     print(f"{doc_values.get('text')=}")  
     
