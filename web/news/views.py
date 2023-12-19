@@ -131,48 +131,6 @@ async def parse_item(url: str,
         else:
             doc_values["img"] = img_url
 
-    print(f"{doc_values.get('img')=}")           
-                
-
-    
-    # # process the fields
-    # for key, val in doc_values.items():
-
-    #     if not (key and val):
-    #         continue
-        
-    #     # the result fields are in the list with various level of nested, 
-    #     # so lets try to get all data just as string values
-        
-    #     # for text field combine all elements inside the list
-    #     if key == "text":
-    #         while isinstance(val, list):
-    #             if isinstance(val[0], list):
-    #                 val = val[0]
-    #             else:
-    #                 val = " ".join(" ".join(val).split()[:50]) + "..."
-    #                 doc_values[key] = val
-    #     else:
-    #         # for title and pic just get the nested list and get the string from it
-    #         while isinstance(val, list):
-    #             val = val[0]
-    #         doc_values[key] = val.strip()
-            
-    #         # for image process url to working form
-    #         if key == "img":
-    #             if not val.startswith('https:'):
-    #                 val = base_url + '/' + val.lstrip('/')
-    #                 doc_values[key] = val
-    #             elif val.startswith('https://www.youtube.com/embed/'):
-    #                 video_id = re.findall('https://www.youtube.com/embed/(.*)\?.*', val)[0]
-    #                 val = f'https://img.youtube.com/vi/{video_id}/maxresdefault.jpg'
-    #                 doc_values[key] = val
-                    
-    #             if DETECT_FACES:
-    #                 doc_values[key] = img_server + '/img/' + quote(doc_values[key], safe='')
-
-    
-    # if DETECT_FACES:
-    #     doc_values['orig_img'] = doc_values.get["img"]              
+    print(f"{doc_values.get('img')=}")                 
     
     return doc_values
