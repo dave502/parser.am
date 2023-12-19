@@ -113,7 +113,7 @@ async def parse_item(url: str, fields: dict[str:list[str]]) -> dict:
                     doc_values[key] = val
                     
                 if DETECT_FACES:
-                    doc_values[key] = 'img_proc/img/' + quote(doc_values[key], safe='')
+                    doc_values[key] = 'http://img_proc/img/' + quote(doc_values[key], safe='')
                     
     
     return doc_values
