@@ -81,26 +81,29 @@ async def parse_item(url: str, fields: dict[str:list[str]]) -> dict:
     # get from tree all fields with given tags
     doc_values = {field_key: ([tree.xpath(field_val) for field_val in fields if tree.xpath(field_val)]) 
         for (field_key, fields) in fields.items()}
-        
+    
+    print(f"{len(doc_values)=}")    
         
     if title := doc_values.get("title"):
         while isinstance(title, list):
             title = title[0]
         doc_values["title"] = title.strip()     
-        
+     
+    print(f"{doc_values.get('title')=}")     
         
     if text := doc_values.get("text"):
         while isinstance(text, list):
             if isinstance(text[0], list):
                 text = text[0]
             else:
+                print(f"{text=}")   
                 if SUMMARIZE_TEXT:
                     ...
                 else:
                     text = " ".join(" ".join(text).split()[:50]) + "..."
                 doc_values["text"] = text   
         
-    
+    print(f"{doc_values.get('text')=}")  
     
     if img_url := doc_values.get("img"):
         # for title and pic just get the nested list and get the string from it
@@ -121,7 +124,7 @@ async def parse_item(url: str, fields: dict[str:list[str]]) -> dict:
         else:
             doc_values["img"] = img_url
 
-                
+    print(f"{doc_values.get('img')=}")           
                 
 
     
