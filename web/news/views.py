@@ -62,7 +62,8 @@ async def parse_item(url: str, fields: dict[str:list[str]]) -> dict:
 
     DETECT_FACES = True
     SUMMARIZE_TEXT = True
-    img_server = os.getenv('IMG_SERVER') 
+    img_server = os.getenv('IMG_SERVER', 'http://213.171.14.158:8080/') 
+    txt_server = os.getenv('TXT_SERVER', 'http://213.171.14.158:8080/') 
 
     base_url = 'https://news.am'
     # some urls are wihout domain and some (from news branches) are with domain,
@@ -98,7 +99,8 @@ async def parse_item(url: str, fields: dict[str:list[str]]) -> dict:
             else:
                 print(f"{text=}")   
                 if SUMMARIZE_TEXT:
-                    text = text[0]
+                    resp = requests.get(txt_server, params={'text': text[0]})
+                    text = resp.json().get('text')
                 else:
                     text = " ".join(" ".join(text).split()[:50]) + "..."
         doc_values["text"] = text   

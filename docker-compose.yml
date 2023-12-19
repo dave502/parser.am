@@ -20,7 +20,7 @@ services:
     environment:
       - DB_PATH=/app/sqlite
       - IMG_SERVER=http://213.171.14.158:8080/
-
+      - TXT_SERVER=http://213.171.14.158:8070/
     networks:
       - parser
       
@@ -31,16 +31,20 @@ services:
     container_name: img_processor
     hostname: img
     ports:
-      # - 8500:8500
-      # - 8501:8501
       - 8080:8080
     volumes:
       - ./img_processor/images_new:/app/images_new
-    # environment:
-    #   - TENSORFLOW_SERVING_MODEL_NAME=${MODEL_NAME}
-      # - MODEL_PATH=${MODEL_PATH}
-      # - SAVED_MODEL_PATH=${SAVED_MODEL_PATH}
-    #entrypoint: [ "bash", "-c", "tensorflow_model_server --rest_api_port=8501 --model_name=$MODEL_NAME --model_base_path=$MODEL_PATH"]
+    networks:
+      - parser
+      
+  txt_proc:
+    build:
+       context: ./text_processor
+       dockerfile: Dockerfile
+    container_name: text_processor
+    hostname: txt
+    ports:
+      - 8070:8080
     networks:
       - parser
       
